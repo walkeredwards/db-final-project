@@ -2,7 +2,7 @@ import sqlite3
 
 
 def setup_database() -> None:
-    conn = sqlite3.connect("fitness.db")
+    conn = sqlite3.connect("Sales.db")
     cursor = conn.cursor()
 
     cursor.execute("""
