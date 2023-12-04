@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
-from pymongo.errors import OperationFailure
-from datetime import datetime
+# from pymongo.errors import OperationFailure
+# from datetime import datetime
 
 path_to_certificate = '/home/hectorramirez/gitHub/X509-\
 cert-1147331512641107939.pem'
