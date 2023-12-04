@@ -5,9 +5,11 @@ from pymongo.server_api import ServerApi
 
 path_to_certificate = '/home/hectorramirez/gitHub/X509-\
 cert-1147331512641107939.pem'
+#path_to_certificate =''
 uri = 'mongodb+srv://cluster0.j1hw0tj.mongodb.net/?authSource\
 =%24external&authMechanism=MONGODB-X509&retryWrites=true&w=\
 majority'
+#uri = ''
 client = MongoClient(
     uri,
     tls=True,
@@ -24,5 +26,15 @@ print(doc_count)
 # Print the updated document
 updated_document = collection.find_one({})
 print(updated_document)
+
+# selects table movies
+collection = db["sales"]
+doc_count = collection.count_documents({})
+print(doc_count)
+
+# Print the updated document
+updated_document = collection.find_one({})
+print(updated_document)
+
 
 # Beautify output using pip rich

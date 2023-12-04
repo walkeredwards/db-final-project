@@ -107,19 +107,19 @@ def main() -> None:
                 if option == 8:
                     exit(0)
                 elif option == 1:
-                    setup_database(db_file)
+                    setup_database(collection)
                 elif option == 2:
-                    add_student(db_file)
+                    add_student(collection)
                 elif option == 3:
-                    add_grades(db_file)
+                    add_grades(collection)
                 elif option == 4:
-                    read_student(db_file)
+                    read_student(collection)
                 elif option == 5:
-                    update_student(db_file)
+                    update_student(collection)
                 elif option == 6:
-                    update_grades(db_file)
+                    update_grades(collection)
                 elif option == 7:
-                    delete_student(db_file)
+                    delete_student(collection)
             
         if option == 2:
             collection = db["inventory"]
@@ -128,19 +128,19 @@ def main() -> None:
                 if option == 8:
                     exit(0)
                 elif option == 1:
-                    setup_database(db_file)
+                    setup_database(collection)
                 elif option == 2:
-                    add_student(db_file)
+                    add_student(collection)
                 elif option == 3:
-                    add_grades(db_file)
+                    add_grades(collection)
                 elif option == 4:
-                    read_student(db_file)
+                    read_student(collection)
                 elif option == 5:
-                    update_student(db_file)
+                    update_student(collection)
                 elif option == 6:
-                    update_grades(db_file)
+                    update_grades(collection)
                 elif option == 7:
-                    delete_student(db_file)
+                    delete_student(collection)
                     
             
             
