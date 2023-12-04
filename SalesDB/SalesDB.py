@@ -39,7 +39,7 @@ def delete_document():
     collection.delete_one(filter_criteria)
     print("Document deleted successfully.")
     
-def show_menu() -> int:
+def show_tableMenu() -> int:
     """Displays menu for working in wich table .
         Must be changed later"""
     text = """
@@ -97,23 +97,55 @@ def main() -> None:
     # Connect to database
     db = client["sample_supplies"]
     while True:
-        option = show_table_menu()
-        if option == 8:
+        option = show_tableMenu()
+        if option == 3:
             exit(0)
-        elif option == 1:
-            setup_database(db_file)
-        elif option == 2:
-            add_student(db_file)
-        elif option == 3:
-            add_grades(db_file)
-        elif option == 4:
-            read_student(db_file)
-        elif option == 5:
-            update_student(db_file)
-        elif option == 6:
-            update_grades(db_file)
-        elif option == 7:
-            delete_student(db_file)
+        if option == 1:
+            collection = db["sales"]
+            option = show_salesMenu()
+            while True:
+                if option == 8:
+                    exit(0)
+                elif option == 1:
+                    setup_database(db_file)
+                elif option == 2:
+                    add_student(db_file)
+                elif option == 3:
+                    add_grades(db_file)
+                elif option == 4:
+                    read_student(db_file)
+                elif option == 5:
+                    update_student(db_file)
+                elif option == 6:
+                    update_grades(db_file)
+                elif option == 7:
+                    delete_student(db_file)
+            
+        if option == 2:
+            collection = db["inventory"]
+            option = show_inventoryMenu()
+            while True:
+                if option == 8:
+                    exit(0)
+                elif option == 1:
+                    setup_database(db_file)
+                elif option == 2:
+                    add_student(db_file)
+                elif option == 3:
+                    add_grades(db_file)
+                elif option == 4:
+                    read_student(db_file)
+                elif option == 5:
+                    update_student(db_file)
+                elif option == 6:
+                    update_grades(db_file)
+                elif option == 7:
+                    delete_student(db_file)
+                    
+            
+            
+            
+    
 
 
 if __name__ == "__main__":
