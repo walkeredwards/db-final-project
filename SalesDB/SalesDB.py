@@ -2,6 +2,7 @@ import os
 import time
 from typing import Tuple
 from utility import utilityInventory
+from utility import utilitySales
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 # from pymongo.errors import OperationFailure
@@ -78,8 +79,8 @@ def show_salesMenu() -> int:
     Select one of the following menu options:
     1. Setup Database
     2. Add a New Sale
-    3. Update Buy
-    4. Update Item Name
+    3. Update Shipping Location
+    4. Update Item and Price
     5. Update Date and Time
     6. Look up Sale
     7. Delete Sale
@@ -114,7 +115,7 @@ def main() -> None:
                 elif option == 1:
                     setup_database(collection)
                 elif option == 2:
-                    update_suplier(collection)
+                    utilitySales.newSale(collection)
                 elif option == 3:
                     update_suplier(collection)
                 elif option == 4:
