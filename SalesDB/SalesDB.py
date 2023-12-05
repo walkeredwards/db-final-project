@@ -83,7 +83,7 @@ def show_salesMenu() -> int:
     4. Update Item and Price
     5. Update Date and Time
     6. Look up Sale
-    7. Delete Sale
+    7. Cancel Order
     8. Exit the program
     """
     print(text)
@@ -117,15 +117,15 @@ def main() -> None:
                 elif option == 2:
                     utilitySales.newSale(collection)
                 elif option == 3:
-                    update_suplier(collection)
+                    utilitySales.update_shipping_location(collection)
                 elif option == 4:
-                    update_name(collection)
+                    update_name(collection)#item and price
                 elif option == 5:
-                    update_time(collection)
+                    update_time(collection)#date and time
                 elif option == 6:
-                    update_amount(collection)
+                    utilitySales.look_up(collection)#look up
                 elif option == 7:
-                    delete_sale(collection)
+                    delete_sale(collection) #delete sale
             
         if option == 2:
             collection = db["inventory"]
