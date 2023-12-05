@@ -30,9 +30,14 @@ def newShipment(collection):
     arrivalTime = current_datetime.strftime('%Y-%m-%dT%H:%M:%S.%f%z')
     location = input("What warehouse location this shipment arrived?")
     suplier = input("From wich suplier?")
-    howMany = input("How many items arrived in this shipment?")
+    howMany = int(input("How many items arrived in this shipment?"))
+    print(howMany)
+    howMany = howMany-1
+    print(howMany)
+    itemClass = []
     for i in range(howMany):
-        if i == 1:
+        print(i)
+        if i == 0:
             name = input("Whats the name of the item?")
             quantity = int(input("How many arrived?"))
             pridePaid = float(input("Whats the price paid for this shipment?"))
@@ -43,10 +48,23 @@ def newShipment(collection):
                 tagsBool = 0
             if tagsBool:
                 tags = []
-                for i in int(input("How many would you like to add")):
-                    tags.append(str(input(":")))
-
-            itemsClass = inveventoryItem(name, tags, pridePaid, quantity)
+                x = int(input("How many would you like to add:"))
+                for i in range(x):
+                    if i == 0:
+                        tags.append(str(input("")))
+                    else:
+                        tags.append(str(input(",")))
+            itemClass.append(inveventoryItem(name, tags, pridePaid, quantity))
+            
+            document = {
+            "arrivalDate": arrivalTime,
+            "Items": itemClass,
+            "storageLocation": location,
+            "supplier": suplier
+            }
+            collection.insert_one(document)
+            print("Document created successfully.")
+            
         if i > 1:
             name = input("Whats the name of the item?")
             quantity = int(input("How many arrived?"))
@@ -58,18 +76,19 @@ def newShipment(collection):
                 tagsBool = 0
             if tagsBool:
                 tags = []
-                for i in int(input("How many would you like to add")):
-                    tags.append(str(input(":")))
+                x = int(input("How many would you like to add:"))
+                for i in range(x):
+                    if i == 0:
+                        tags.append(str(input("")))
+                    else:
+                        tags.append(str(input(",")))
+            itemClass.append(newShipment(name, tags, pridePaid, quantity))
+            print(itemClass[i])
+            try:
+                collection.update_one({"arrivalDate": arrivalTime}, {"$push": {"Items": itemClass[i]}})
+                print("Item pushed sucssecfully.")
+            except:
+                print("Item push failed")
+            
 
-            itemsClass = inveventoryItem(name, tags, pridePaid, quantity)
-    try:        
-        document = {
-            'arrivalDate': arrivalTime,
-            'Items': [itemsClass],
-            'storageLocation': location,
-            'supplier': suplier
-        }
-        collection.insert_one(document)
-        print("Document created successfully.")
-    except:
-        print("Document creation failed")
+   

@@ -1,7 +1,7 @@
 import os
 import time
 from typing import Tuple
-from utility import utility
+from utility import utilityInventory
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 # from pymongo.errors import OperationFailure
@@ -16,28 +16,6 @@ client = MongoClient(
     tls=True,
     tlsCertificateKeyFile=path_to_certificate,
     server_api=ServerApi("1"))
-
-def read_documents():
-    # Implement logic to read documents
-    # Example:
-    documents = collection.find()
-    for doc in documents:
-        print(doc)
-
-def update_document():
-    # Implement logic to update a document
-    # Example:
-    filter_criteria = {'storageLocation': 'Denver'}
-    update_values = {'$set': {'supplier': 'Updated Supplier'}}
-    collection.update_one(filter_criteria, update_values)
-    print("Document updated successfully.")
-
-def delete_document():
-    # Implement logic to delete a document
-    # Example:
-    filter_criteria = {'storageLocation': 'Denver'}
-    collection.delete_one(filter_criteria)
-    print("Document deleted successfully.")
     
 def show_tableMenu() -> int:
     """Displays menu for working in wich table .
@@ -63,7 +41,35 @@ def show_tableMenu() -> int:
         os.system('clear')
         option = input("Enter a valid option: ")
         
-def show_menu() -> int:
+def show_salesMenu() -> int:
+    """Displays menu.
+        Must be changed later"""
+    text = """
+    A+ Grade Book
+    =============
+
+    Select one of the following menu options:
+    1. Setup Database
+    2. Add a new student
+    3. Add new grades for a student
+    4. Display student
+    5. Update student information
+    6. Update student grades
+    7. Delete student
+    8. Exit the program
+    """
+    print(text)
+    option = input('Enter an option: [1-8]: ')
+    while True:
+        if option.isdecimal():
+            opt = int(option)
+            if 1 <= opt <= 8:
+                return opt
+        os.system('clear')
+        option = input("Enter a valid option: ")
+
+
+def show_inventoryMenu() -> int:
     """Displays menu.
         Must be changed later"""
     text = """
@@ -103,24 +109,7 @@ def main() -> None:
         if option == 1:
             collection = db["sales"]
             option = show_salesMenu()
-            while True:
-                if option == 8:
-                    exit(0)
-                elif option == 1:
-                    setup_database(collection)
-                elif option == 2:
-                    add_student(collection)
-                elif option == 3:
-                    add_grades(collection)
-                elif option == 4:
-                    read_student(collection)
-                elif option == 5:
-                    update_student(collection)
-                elif option == 6:
-                    update_grades(collection)
-                elif option == 7:
-                    delete_student(collection)
-            
+    
         if option == 2:
             collection = db["inventory"]
             option = show_inventoryMenu()
@@ -128,25 +117,7 @@ def main() -> None:
                 if option == 8:
                     exit(0)
                 elif option == 1:
-                    setup_database(collection)
-                elif option == 2:
-                    add_student(collection)
-                elif option == 3:
-                    add_grades(collection)
-                elif option == 4:
-                    read_student(collection)
-                elif option == 5:
-                    update_student(collection)
-                elif option == 6:
-                    update_grades(collection)
-                elif option == 7:
-                    delete_student(collection)
-                    
-            
-            
-            
-    
-
+                    utilityInventory.newShipment(collection)
 
 if __name__ == "__main__":
     main()
