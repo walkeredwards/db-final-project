@@ -113,19 +113,19 @@ def main() -> None:
                 if option == 8:
                     exit(0)
                 elif option == 1:
-                    setup_database(collection)
+                    utilitySales.test_push(collection)
                 elif option == 2:
                     utilitySales.newSale(collection)
                 elif option == 3:
                     utilitySales.update_shipping_location(collection)
                 elif option == 4:
-                    update_name(collection)#item and price
-                elif option == 5:
-                    update_time(collection)#date and time
-                elif option == 6:
-                    utilitySales.look_up(collection)#look up
-                elif option == 7:
-                    delete_sale(collection) #delete sale
+                    utilitySales.update_item(collection)#item and price
+                #elif option == 5:
+                    #update_time(collection)#date and time
+                #elif option == 6:
+                    #utilitySales.look_up(collection)#look up
+                #elif option == 7:
+                    #delete_sale(collection) #delete sale
             
         if option == 2:
             collection = db["inventory"]
@@ -133,6 +133,8 @@ def main() -> None:
             while True:
                 if option == 8:
                     exit(0)
+                
+                """
                 elif option == 1:
                     setup_database(collection)
                 elif option == 2:
@@ -147,7 +149,7 @@ def main() -> None:
                     update_grades(collection)
                 elif option == 7:
                     delete_student(collection)
-                    
+                """
             
             
             
