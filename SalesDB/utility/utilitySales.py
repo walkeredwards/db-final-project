@@ -70,7 +70,6 @@ def update_item_(collection):
 
     new_item = input("Please enter name of new item: ")
     new_price = input("What is the price of the new item")
-    new_
 
 
 
