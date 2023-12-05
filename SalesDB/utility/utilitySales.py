@@ -2,8 +2,7 @@ from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 from datetime import datetime
 
-path_to_certificate = '/home/hectorramirez/gitHub/X509-\
-cert-1147331512641107939.pem'
+path_to_certificate = '../X509-cert-1147331512641107939.pem'
 
 uri = 'mongodb+srv://cluster0.j1hw0tj.mongodb.net/?authSource\
 =%24external&authMechanism=MONGODB-X509&retryWrites=true&w=\
@@ -16,10 +15,9 @@ client = MongoClient(
     server_api=ServerApi("1"))
 
 class saleItem:
-    def __init__(self, name, tags, pricePaid, quantity):
+    def __init__(self, name, price_paid, quantity):
         self.name = name
-        self.tags = tags
-        self.priceSold = pricePaid
+        self.price_paid = price_paid
         self.quantity = quantity
 
 def get_next_order_number(collection):
@@ -34,17 +32,19 @@ def newSale(collection):
     howMany = int(input("How many items are being shipped in this shipment?"))
     items = []
     for i in range(howMany):
-        name = input("Whats the name of the item?")
-        quantity = int(input("How many of these items are being shipped? "))
-        pricePaid = float(input("What is the total price for the order? "))
-        item_temp = saleItem(name, [], pricePaid, quantity)
+        name = input("Whats the name of the item: ")
+        price_paid = float(input("How much is the item: "))
+        quantity = int(input("How many of these items did you buy: "))
+        item_temp = saleItem(name, price_paid, quantity)
         items.append(item_temp)
     order_number = get_next_order_number(collection)        
+    total_price = price_paid * quantity
     document = {
         'DatePlaceedOrder': orderTime,
         'Items': items,
         'Shipping Address': location,
-        'Order Number' : order_number
+        'Order Number' : order_number,
+        'Total Price' : total_price
     }
     collection.insert_one(document)
     print("Document created successfully.")
@@ -60,4 +60,9 @@ def updateShippingLocation(collection):
         print(f"Shipping address for order {order_num} updated successfully.")
     else:
         print("No Order found with order number.")
+
+def look_up(collection):
+    order_num = int(input("Please enter your order number: "))
+    search = {"Order Number": order_num}
+    return collection.find_one(search)
     
