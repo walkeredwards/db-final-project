@@ -5,7 +5,8 @@ from pymongo.server_api import ServerApi
 
 path_to_certificate = '/home/hectorramirez/gitHub/X509-\
 cert-1147331512641107939.pem'
-#path_to_certificate =''
+#path_to_certificate ='/Users/walkeredwards/CSCI/CS\
+    #CI_260/X509-cert-1147331512641107939.pem'
 uri = 'mongodb+srv://cluster0.j1hw0tj.mongodb.net/?authSource\
 =%24external&authMechanism=MONGODB-X509&retryWrites=true&w=\
 majority'

@@ -1,7 +1,7 @@
 import os
 import time
 from typing import Tuple
-from utility import utility
+from utility import utilityInventory
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 # from pymongo.errors import OperationFailure
@@ -17,27 +17,32 @@ client = MongoClient(
     tlsCertificateKeyFile=path_to_certificate,
     server_api=ServerApi("1"))
 
-def read_documents():
-    # Implement logic to read documents
-    # Example:
-    documents = collection.find()
-    for doc in documents:
-        print(doc)
+def show_inventoryMenu() -> int:
+    """Displays menu.
+        Must be changed later"""
+    text = """
+    Inventory Menu
+    =============
 
-def update_document():
-    # Implement logic to update a document
-    # Example:
-    filter_criteria = {'storageLocation': 'Denver'}
-    update_values = {'$set': {'supplier': 'Updated Supplier'}}
-    collection.update_one(filter_criteria, update_values)
-    print("Document updated successfully.")
-
-def delete_document():
-    # Implement logic to delete a document
-    # Example:
-    filter_criteria = {'storageLocation': 'Denver'}
-    collection.delete_one(filter_criteria)
-    print("Document deleted successfully.")
+    Select one of the following menu options:
+    1. Setup Database
+    2. Add a New Shipment
+    3. Update Suplier
+    4. Update Item Name
+    5. Update Date and Time
+    6. Update Item Amount
+    7. Delete Sale
+    8. Exit the program
+    """
+    print(text)
+    option = input('Enter an option: [1-8]: ')
+    while True:
+        if option.isdecimal():
+            opt = int(option)
+            if 1 <= opt <= 8:
+                return opt
+        os.system('clear')
+        option = input("Enter a valid option: ")
     
 def show_tableMenu() -> int:
     """Displays menu for working in wich table .
@@ -63,21 +68,21 @@ def show_tableMenu() -> int:
         os.system('clear')
         option = input("Enter a valid option: ")
         
-def show_menu() -> int:
+def show_salesMenu() -> int:
     """Displays menu.
         Must be changed later"""
     text = """
-    A+ Grade Book
+    Sales Menu
     =============
 
     Select one of the following menu options:
     1. Setup Database
-    2. Add a new student
-    3. Add new grades for a student
-    4. Display student
-    5. Update student information
-    6. Update student grades
-    7. Delete student
+    2. Add a New Sale
+    3. Update Buy
+    4. Update Item Name
+    5. Update Date and Time
+    6. Look up Sale
+    7. Delete Sale
     8. Exit the program
     """
     print(text)
@@ -109,17 +114,17 @@ def main() -> None:
                 elif option == 1:
                     setup_database(collection)
                 elif option == 2:
-                    add_student(collection)
+                    update_suplier(collection)
                 elif option == 3:
-                    add_grades(collection)
+                    update_suplier(collection)
                 elif option == 4:
-                    read_student(collection)
+                    update_name(collection)
                 elif option == 5:
-                    update_student(collection)
+                    update_time(collection)
                 elif option == 6:
-                    update_grades(collection)
+                    update_amount(collection)
                 elif option == 7:
-                    delete_student(collection)
+                    delete_sale(collection)
             
         if option == 2:
             collection = db["inventory"]
