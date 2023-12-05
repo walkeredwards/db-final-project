@@ -26,21 +26,20 @@ def show_inventoryMenu() -> int:
     =============
 
     Select one of the following menu options:
-    1. Setup Database
-    2. Add a New Shipment
-    3. Update Suplier
-    4. Update Item Name
+    1. Add a New Shipment
+    2. Update Suplier
+    3. Update Item Name
+    4. Update Item Amount
     5. Update Date and Time
-    6. Update Item Amount
-    7. Delete Sale
-    8. Exit the program
+    6. Delete Shipment
+    7. Exit the program
     """
     print(text)
-    option = input('Enter an option: [1-8]: ')
+    option = input('Enter an option: [1-7]: ')
     while True:
         if option.isdecimal():
             opt = int(option)
-            if 1 <= opt <= 8:
+            if 1 <= opt <= 7:
                 return opt
         os.system('clear')
         option = input("Enter a valid option: ")
@@ -111,7 +110,7 @@ def main() -> None:
             option = show_salesMenu()
             while True:
                 if option == 8:
-                    exit(0)
+                    break
                 elif option == 1:
                     setup_database(collection)
                 elif option == 2:
@@ -131,22 +130,22 @@ def main() -> None:
             collection = db["inventory"]
             option = show_inventoryMenu()
             while True:
-                if option == 8:
-                    exit(0)
+                if option == 7:
+                    break
                 elif option == 1:
-                    setup_database(collection)
+                    utilityInventory.newShipment(collection)
                 elif option == 2:
-                    add_student(collection)
+                    supplier = input("What is the supplier you would like to update")
+                    utilityInventory.updateSupplier(collection, supplier)
                 elif option == 3:
-                    add_grades(collection)
+                    utilityInventory.updateItemName(collection)
                 elif option == 4:
-                    read_student(collection)
+                    utilityInventory.updateItemAmout(collection)
                 elif option == 5:
-                    update_student(collection)
+                    utilityInventory.UpdateDateTime(collection)
                 elif option == 6:
-                    update_grades(collection)
-                elif option == 7:
-                    delete_student(collection)
+                    utilityInventory.deleteShipment(collection)
+
                     
             
             

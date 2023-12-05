@@ -96,6 +96,28 @@ def findShipment(collection, supplier):#maybe select a diferent way of looking
     except OperationFailure as ex:
         raise ex
 
+def updateSupplier(collection, supplier):
+        try:
+            new_supplier = input("Enter the new supplier: ")
+        
+            updatedCollection = collection.find_one_and_update(
+                {"supplier": supplier},
+                {"$set": {"supplier": new_supplier}},
+                new = True
+            )
+
+            print("Shipment updated successfully.")
+            print(updatedCollection)
+        except OperationFailure as ex:
+            raise ex
+
+def deleteShipment(collection, supplier):
+    try:
+        collection.delete_one({"supplier": supplier})
+        print("Shipment deleted successfully.")
+    except OperationFailure as ex:
+        raise ex
+
 def updateShipment(collection, storageLocation):
     try:
         # Assuming you want to update the entire shipment
