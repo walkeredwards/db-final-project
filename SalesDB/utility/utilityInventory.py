@@ -96,14 +96,14 @@ def findShipment(collection, supplier):#maybe select a diferent way of looking
     except OperationFailure as ex:
         raise ex
 
-def updateShipment(collection, arrival_time):
+def updateShipment(collection, storageLocation):
     try:
         # Assuming you want to update the entire shipment
         new_location = input("Enter the new warehouse location: ")
         new_supplier = input("Enter the new supplier: ")
-
+    
         collection.update_one(
-            {"arrivalDate": arrival_time},
+            {"storageLocation": storageLocation},
             {"$set": {"storageLocation": new_location, "supplier": new_supplier}}
         )
 
@@ -111,9 +111,9 @@ def updateShipment(collection, arrival_time):
     except OperationFailure as ex:
         raise ex
 
-def deleteShipment(collection, arrival_time):
+def deleteShipment(collection, supplier):
     try:
-        collection.delete_one({"arrivalDate": arrival_time})
+        collection.delete_one({"supplier": supplier})
         print("Shipment deleted successfully.")
     except OperationFailure as ex:
         raise ex
