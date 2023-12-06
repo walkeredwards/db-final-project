@@ -112,7 +112,8 @@ def main() -> None:
                 if option1 == 7:
                     exit(0)
                 elif option1 == 1:
-                    utilitySales.newSale(collection)
+                    collection2 = db["inventory"]
+                    utilitySales.newSale(collection, collection2)
                     break
                 elif option1 == 2:
                     utilitySales.update_shipping_location(collection)
