@@ -7,8 +7,8 @@ from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 # from pymongo.errors import OperationFailure
 
-path_to_certificate = './X509-\
-cert-1147331512641107939.pem'
+path_to_certificate = 'SalesDB/cert.pem'
+
 uri = 'mongodb+srv://cluster0.j1hw0tj.mongodb.net/?authSource\
 =%24external&authMechanism=MONGODB-X509&retryWrites=true&w=\
 majority'
@@ -77,14 +77,13 @@ def show_salesMenu() -> int:
     =============
 
     Select one of the following menu options:
-    1. Setup Database
-    2. Add a New Sale
-    3. Update Shipping Location
-    4. Update Item and Price
-    5. Update Date and Time
-    6. Look up Sale
-    7. Cancel Order
-    8. Exit the program
+    1. Add a New Sale
+    2. Update Shipping Location
+    3. Update Item and Price
+    4. Update Date and Time
+    5. Look up Sale
+    6. Cancel Order
+    7. Exit the program
     """
     print(text)
     option = input('Enter an option: [1-8]: ')
@@ -108,24 +107,29 @@ def main() -> None:
             exit(0)
         if option == 1:
             collection = db["sales"]
-            option = show_salesMenu()
+            option1 = show_salesMenu()
             while True:
-                if option == 8:
+                if option1 == 7:
                     exit(0)
-                elif option == 1:
-                    utilitySales.test_push(collection)
-                elif option == 2:
+                elif option1 == 1:
                     utilitySales.newSale(collection)
-                elif option == 3:
+                    break
+                elif option1 == 2:
                     utilitySales.update_shipping_location(collection)
-                elif option == 4:
+                    break
+                elif option1 == 3:
                     utilitySales.update_item(collection)#item and price
-                #elif option == 5:
-                    #update_time(collection)#date and time
-                #elif option == 6:
-                    #utilitySales.look_up(collection)#look up
-                #elif option == 7:
-                    #delete_sale(collection) #delete sale
+                    break
+                elif option1 == 4:
+                    utilitySales.update_date_and_time(collection)
+                    break
+                elif option1 == 5:
+                    utilitySales.look_up(collection)
+                    break
+                elif option1 == 6:
+                    utilitySales.delete_by_order_num(collection)
+                    break
+                
             
         if option == 2:
             collection = db["inventory"]

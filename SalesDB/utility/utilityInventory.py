@@ -5,16 +5,12 @@ from datetime import datetime
 # from pymongo.errors import OperationFailure
 # from datetime import datetime
 
-path_to_certificate = '../cert.pem'
+path_to_certificate = 'SalesDB/cert.pem'
 # path_to_certificate =''
 uri = 'mongodb+srv://cluster0.j1hw0tj.mongodb.net/?authSource\
 =%24external&authMechanism=MONGODB-X509&retryWrites=true&w=\
 majority'
-print(f'{path_to_certificate=}')
-with open(path_to_certificate) as fin:
-    print(fin.read())
 
-    
 client = MongoClient(
     uri,
     tls=True,
