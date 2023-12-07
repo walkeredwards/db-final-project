@@ -107,23 +107,17 @@ def main() -> None:
                     break
                 elif option == 1:
                     utilitySales.new_sale(collection, collection2)
-                    break
                 elif option == 2:
                     utilitySales.update_shipping_location(collection)
-                    break
                 elif option == 3:
                     utilitySales.update_item(
                         collection, collection2)  # item and price
-                    break
                 elif option == 4:
                     utilitySales.update_date_and_time(collection)
-                    break
                 elif option == 5:
                     utilitySales.look_up(collection)
-                    break
                 elif option == 6:
                     utilitySales.delete_by_order_num(collection, collection2)
-                    break
         elif option == 2:
             collectionShip = db["shipment"]
             collectionInv = db["inventory"]
