@@ -30,7 +30,7 @@ def new_sale(collection, collection2) -> None:
             input("How many items are being shipped in this shipment? "))
         items = []
         total_price = 0
-        for i in range(how_many):
+        for _ in range(how_many):
             name = input("Whats the name of the item: ")
             price_paid = float(input("How much is the item: "))
             quantity = int(input("How many of these items were bought: "))
