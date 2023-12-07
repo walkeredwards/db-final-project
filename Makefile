@@ -27,10 +27,8 @@ clean:
 	rm -rf .mypy_cache
 	rm -rf .hypothesis
 
-
 .PHONY: push
 push: run-test clean
-	
 
 .PHONY: fix-style
 fix-style:
