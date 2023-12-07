@@ -143,7 +143,8 @@ def update_item(collection, collection2) -> None:
                     updated_order = collection.find_one(search1)
                     new_total_price = 0
                     for item in updated_order['items']:
-                        new_total_price += (item['pricePaid'] * item['quantity'])
+                        new_total_price += (item['pricePaid']
+                                            * item['quantity'])
                     collection.update_one(
                         search1, {
                             "$set": {

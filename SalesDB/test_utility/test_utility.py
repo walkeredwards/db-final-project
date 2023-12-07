@@ -5,6 +5,7 @@ from unittest.mock import patch, Mock
 from utility import utilityInventory
 from utility import utilitySales
 
+
 class TestDB(unittest.TestCase):
     def setUp(self) -> None:
         """Setup
@@ -30,8 +31,20 @@ class TestDB(unittest.TestCase):
 
         # Mocking user input
         user_inputs = [
-            "Location1", "Supplier1", "2", "Item1", "10", "5.0", "Y", "2", "Tag1", "Tag2", "Item2", "8", "7.0", "N"
-        ]
+            "Location1",
+            "Supplier1",
+            "2",
+            "Item1",
+            "10",
+            "5.0",
+            "Y",
+            "2",
+            "Tag1",
+            "Tag2",
+            "Item2",
+            "8",
+            "7.0",
+            "N"]
 
         with patch('builtins.input', side_effect=user_inputs):
             # Mocking database collections
@@ -39,7 +52,8 @@ class TestDB(unittest.TestCase):
             mock_inv_collection = Mock()
 
             # Call the function to test
-            utilityInventory.newShipment(mock_ship_collection, mock_inv_collection)
+            utilityInventory.newShipment(
+                mock_ship_collection, mock_inv_collection)
 
             # Assertions
             mock_ship_collection.insert_one.assert_called_once()
