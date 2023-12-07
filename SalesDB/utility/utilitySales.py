@@ -3,22 +3,27 @@ from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 from utility import utilityInventory
 
-def get_next_order_number(collection):
+def get_next_order_number(collection) -> None:
     """Checks the data base for the highest order number and adds 1 to it
     If no order number start at 1
 
     Args:
-        collection (_type_): _description_
-
-    Returns:
-        _type_: _description_
+        collection: sales db collection
     """
     result = collection.find_one(sort=[("orderNumber", -1)], projection={"orderNumber": 1})
     #help from online resources
     return (result["orderNumber"] + 1) if result else 1
 
-def newSale(collection, collection2):
+def new_sale(collection, collection2) -> None:
+    """Creates New sale. Checks for inventory. removes from inventory
+    and inserts sale.
+
+    Args:
+        collection: sales db collection
+        collection2: inventory db
+    """
     try:
+        order_success = True
         current_datetime = datetime.now()
         order_time = current_datetime.strftime('%Y-%m-%dT%H:%M:%S.%f%z')
         how_many = int(input("How many items are being shipped in this shipment? "))
@@ -28,10 +33,11 @@ def newSale(collection, collection2):
             name = input("Whats the name of the item: ")
             price_paid = float(input("How much is the item: "))
             quantity = int(input("How many of these items were bought: "))
-            
+
             inventory_count = check_main_inv(collection2, name)
             if inventory_count < quantity:
                 print(f"Sorry we only have {inventory_count}, of {name}")
+                order_success = False
                 return
             total_price += price_paid * quantity
             item_temp = {
@@ -40,7 +46,10 @@ def newSale(collection, collection2):
                 'quantity': quantity
             }
             items.append(item_temp)
-            update_main_inv(collection2, name, quantity)
+
+        if order_success:
+            for item in items:
+                take_inv(collection2, item['name'], item['quantity'])
         order_number = get_next_order_number(collection)
         location = input("Where is this sale shipping to? ")
         document = {
@@ -57,7 +66,12 @@ def newSale(collection, collection2):
     except ValueError as err:
         print(f"Error: {err}")
 
-def update_shipping_location(collection):
+def update_shipping_location(collection) -> None:
+    """Updates shipping location given order number
+
+    Args:
+        collection: sales db collection
+    """
     try:
         order_num = int(input("Please enter your order number: "))
         new_address = input("Please enter new shipping address: ")
@@ -73,7 +87,14 @@ def update_shipping_location(collection):
         print(f"Error: {err}")
 
 
-def update_item(collection):
+def update_item(collection, collection2) -> None:
+    """Updates an item. checks inventory for new item. Gains changed inventory.
+    Deletes new item inventory
+
+    Args:
+        collection: sales db
+        collection2: inventory db
+    """
     try:
         order_num = int(input("Please enter your order number: "))
 
@@ -81,6 +102,9 @@ def update_item(collection):
         check1 = collection.find_one(search1)
         if check1:
             old_name = input("Please enter the name of the item to change: ")
+
+
+
             search = {"orderNumber": order_num, "items.name": old_name}
             order = collection.find_one(search)
 
@@ -88,10 +112,17 @@ def update_item(collection):
                 new_item = input("Please enter name of new item: ")
                 new_price = float(input("What is the price of the new item: "))
                 new_quantity = int(input("How many of the new items: "))
-
                 item_index = next((index for (index, item) in enumerate(order['items']) if item['name'] == old_name), None)
                 #help from online resources^
                 if item_index is not None:
+                    current_count = check_main_inv(collection2, new_item)
+
+                    if current_count > new_quantity:
+                        update_main_inv(collection2, old_name, order['items'][item_index]['quantity'])
+                        take_inv(collection2, new_item, new_quantity)
+                    else:
+                        print("Out of stock of requested item")
+                        return
                     update_document = {
                         "$set":{
                                 f"items.{item_index}.name": new_item,
@@ -113,7 +144,11 @@ def update_item(collection):
     except ValueError as err:
         print(f"Error: {err}")
 
-def update_date_and_time(collection):
+def update_date_and_time(collection) -> None:
+    """Updates date and time given order number
+    Args:
+        collection: sales db collection
+    """
     try:
         order_num = int(input("Please enter your order number: "))
 
@@ -131,7 +166,12 @@ def update_date_and_time(collection):
     except ValueError as err:
         print(f"Error: {err}")
 
-def look_up(collection):
+def look_up(collection) -> None:
+    """Looks up and prints order given order number
+
+    Args:
+        collection: sales db collection
+    """
     order_num = int(input("Please enter your order number: "))
     search = {"orderNumber": order_num}
     order = collection.find_one(search)
@@ -150,7 +190,13 @@ def look_up(collection):
         print("No order found with given order number")
 
 
-def delete_by_order_num(collection):
+def delete_by_order_num(collection, collection2) -> None:
+    """deletes order by order number and adds product back to inventory
+
+    Args:
+        collection: sales db collection
+        collection2: inventory db collection
+    """
     try:
         order_num = int(input("Please enter your order number: "))
         search = {"orderNumber": order_num}
@@ -158,6 +204,8 @@ def delete_by_order_num(collection):
         if order:
             option = input("Are you sure you want to delete this order? y|n :")
             if option.lower() == "y":
+                for item in order['items']:
+                    update_main_inv(collection2, item['name'], item['quantity'])
                 collection.delete_one(search)
                 print("Record Deleted")
             else:
@@ -168,7 +216,14 @@ def delete_by_order_num(collection):
         print(f"Error: {err}")
 
 
-def update_main_inv(collection, item_name, count):
+def update_main_inv(collection, item_name, count) -> None:
+    """adds the new quantity to the old one and updates it
+
+    Args:
+        collection: sales db collection
+        item_name: item to check for
+        count: how many items there are
+    """
     search = {"item": item_name}
     in_stock = collection.find_one(search)
     #get the amount linked with item name then add count and update db
@@ -177,7 +232,25 @@ def update_main_inv(collection, item_name, count):
         new_count = item_count + count
 
         collection.update_one(search, {"$set": {"quantity": new_count}})
-        
+
+def take_inv(collection, item_name, count) -> None:
+    """removes items from main inventory
+
+    Args:
+        collection: inventory db collection
+        item_name: item in inventory
+        count: how much of the item in inventory
+    """
+    search = {"item": item_name}
+    in_stock = collection.find_one(search)
+    #get the amount linked with item name then add count and update db
+    if in_stock:
+        item_count = in_stock.get("quantity")
+        new_count = item_count - count
+
+        collection.update_one(search, {"$set": {"quantity": new_count}})
+
+
 
 def check_main_inv(collection2, item_name) -> int:    
     search = {"item": item_name}

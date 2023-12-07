@@ -86,7 +86,7 @@ def show_salesMenu() -> int:
     7. Exit the program
     """
     print(text)
-    option = input('Enter an option: [1-8]: ')
+    option = input('Enter an option: [1-7]: ')
     while True:
         if option.isdecimal():
             opt = int(option)
@@ -107,19 +107,19 @@ def main() -> None:
             exit(0)
         if option == 1:
             collection = db["sales"]
+            collection2 = db["inventory"]
             option1 = show_salesMenu()
             while True:
                 if option1 == 7:
                     exit(0)
                 elif option1 == 1:
-                    collection2 = db["inventory"]
-                    utilitySales.newSale(collection, collection2)
+                    utilitySales.new_sale(collection, collection2)
                     break
                 elif option1 == 2:
                     utilitySales.update_shipping_location(collection)
                     break
                 elif option1 == 3:
-                    utilitySales.update_item(collection)#item and price
+                    utilitySales.update_item(collection, collection2)#item and price
                     break
                 elif option1 == 4:
                     utilitySales.update_date_and_time(collection)
@@ -128,7 +128,7 @@ def main() -> None:
                     utilitySales.look_up(collection)
                     break
                 elif option1 == 6:
-                    utilitySales.delete_by_order_num(collection)
+                    utilitySales.delete_by_order_num(collection, collection2)
                     break
                 
             
