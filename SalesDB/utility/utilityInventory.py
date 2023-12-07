@@ -2,6 +2,7 @@ import pymongo
 from pymongo.errors import OperationFailure
 from datetime import datetime
 from utility import utilitySales
+from rich.console import Console
 
 
 class InventoryItem:
@@ -11,6 +12,32 @@ class InventoryItem:
         self.pricePaid = pricePaid
         self.quantity = quantity
 
+
+def printShip(results) -> None:
+    try:
+        result_list = list(results)
+        result_count = len(result_list)
+
+        if result_count > 0:
+            console = Console()
+
+            for shipment in result_list:
+                console.print("[bold]Order Details:[/bold]")
+                console.print(f"[bold]Shipment Arrival Date:[/bold] {shipment['arrivalDate']}")
+
+                for item in shipment['Items']:
+                    console.print(f"[bold]Item Name:[/bold] {item['name']}")
+                    console.print("[bold]Tags:[/bold]")
+                    tags_str = ", ".join([f"[italic]{tag}[/italic]" for tag in item['tags']])
+                    console.print(f"- {tags_str}")
+                    console.print(f"[bold]Price:[/bold] [green]{item['pricePaid']}[/green]")
+                    console.print(f"[bold]Quantity:[/bold] [blue]{item['quantity']}[/blue]\n")
+        else:
+            console = Console()
+            console.print("No shipments found.[/red]")
+    except OperationFailure as ex:
+        console = Console()
+        console.print(f"Error: {ex}")
 
 def newShipment(collectionShip, collectionInv) -> None:
     current_datetime = datetime.now()
@@ -75,20 +102,14 @@ def findShipmentDate(collection) -> None:
         date_to_search = f"{year_to_search}-{month_to_search}-{day_to_search}"
 
         query = {"arrivalDate": {"$regex": f"^{date_to_search}T"}}
+        
         try:
+            query = {"arrivalDate": {"$regex": f"^{date_to_search}T"}}
             results = collection.find(query)
 
-            result_list = list(results)
-            result_count = len(result_list)
-
-            if result_count > 0:
-                print("Shipments found:")
-                for shipment in result_list:
-                    print(shipment)
-            else:
-                print("No shipments found for the given supplier.")
+            printShip(results)
         except OperationFailure as ex:
-            raise ex
+            print(f"Error: {ex}")
 
     elif option == 2:
         year_to_search = input("Enter the year (e.g., 2018): ")
@@ -100,16 +121,7 @@ def findShipmentDate(collection) -> None:
 
         try:
             results = collection.find(query)
-
-            result_list = list(results)
-            result_count = len(result_list)
-
-            if result_count > 0:
-                print("Shipments found:")
-                for shipment in result_list:
-                    print(shipment)
-            else:
-                print("No shipments found for the given supplier.")
+            printShip(results)
         except OperationFailure as ex:
             raise ex
     elif option == 1:
@@ -120,15 +132,7 @@ def findShipmentDate(collection) -> None:
         try:
             results = collection.find(query)
 
-            result_list = list(results)
-            result_count = len(result_list)
-
-            if result_count > 0:
-                print("Shipments found:")
-                for shipment in result_list:
-                    print(shipment)
-            else:
-                print("No shipments found for the given supplier.")
+            printShip(results)
         except OperationFailure as ex:
             raise ex
 
