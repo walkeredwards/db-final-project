@@ -1,22 +1,7 @@
-from pymongo import MongoClient
+import pymongo
 from pymongo.server_api import ServerApi
 from pymongo.errors import OperationFailure
 from datetime import datetime
-# from pymongo.errors import OperationFailure
-# from datetime import datetime
-
-path_to_certificate = 'SalesDB/cert.pem'
-# path_to_certificate =''
-uri = 'mongodb+srv://cluster0.j1hw0tj.mongodb.net/?authSource\
-=%24external&authMechanism=MONGODB-X509&retryWrites=true&w=\
-majority'
-
-client = MongoClient(
-    uri,
-    tls=True,
-    tlsCertificateKeyFile=path_to_certificate,
-    server_api=ServerApi("1"))
-
 
 class InventoryItem:
     def __init__(self, name, tags, pricePaid, quantity):
@@ -84,25 +69,214 @@ def newShipment(collection):
             except OperationFailure as ex:
                 raise ex
 
-def findShipment(collection, supplier):#maybe select a diferent way of looking
+def findShipmentDate(collection):
+    print("Would you like to look for a Shipment made in a specific year, month or day? ")
+    option = int(input("1. Year\n2. Month\n3. Day :"))
+    if option == 3:
+        year_to_search = input("Enter the year (e.g., 2018): ")
+        month_to_search = input("Enter the month (e.g., 07): ")
+        day_to_search = input("Enter the day (e.g., 18): ")
+
+        date_to_search = f"{year_to_search}-{month_to_search}-{day_to_search}"
+
+        query = {"arrivalDate": {"$regex": f"^{date_to_search}T"}}
+        try:
+            results = collection.find(query)
+
+            result_list = list(results)
+            result_count = len(result_list)
+
+            if result_count > 0:
+                print("Shipments found:")
+                for shipment in result_list:
+                    print(shipment)
+            else:
+                print("No shipments found for the given supplier.")
+        except OperationFailure as ex:
+            raise ex
+            
+    elif option == 2:
+        year_to_search = input("Enter the year (e.g., 2018): ")
+        month_to_search = input("Enter the month (e.g., 07): ")
+
+        date_to_search = f"{year_to_search}-{month_to_search}"
+
+        query = {"arrivalDate": {"$regex": f"^{date_to_search}-"}}
+
+        try:
+            results = collection.find(query)
+
+            result_list = list(results)
+            result_count = len(result_list)
+
+            if result_count > 0:
+                print("Shipments found:")
+                for shipment in result_list:
+                    print(shipment)
+            else:
+                print("No shipments found for the given supplier.")
+        except OperationFailure as ex:
+            raise ex
+    elif option == 1:
+        year_to_search = input("Enter the year (e.g., 2018): ")
+
+        query = {"arrivalDate": {"$regex": f"^{year_to_search}-"}}
+
+        try:
+            results = collection.find(query)
+
+            result_list = list(results)
+            result_count = len(result_list)
+
+            if result_count > 0:
+                print("Shipments found:")
+                for shipment in result_list:
+                    print(shipment)
+            else:
+                print("No shipments found for the given supplier.")
+        except OperationFailure as ex:
+            raise ex
+
+def findShipmentSupplier(collection, supplier):
     try:
-        result = collection.find_one({"supplier": supplier})
-        if result:
-            print("Shipment found:")
-            print(result)
+        result = collection.find({"supplier": supplier})
+
+        result_list = list(result)
+        result_count = len(result_list)
+
+        if result_count > 0:
+            print("Shipments found:")
+            for shipment in result_list:
+                print(shipment)
         else:
-            print("Shipment not found.")
+            print("No shipments found for the given supplier.")
     except OperationFailure as ex:
         raise ex
 
-def updateShipment(collection, arrival_time):
+def findShipmentItem(collection):
+    itemName = input("What's the item you are looking for? ")
     try:
-        # Assuming you want to update the entire shipment
+        result = collection.find({"Items": {"$elemMatch": {"name": itemName}}})
+
+        result_list = list(result)
+        result_count = len(result_list)
+        total = 0
+        if result_count > 0:
+            print(f'{result_count} shipments were found.')
+            for doc in result_list:
+                for item in doc['Items']:
+                    if item['name'] == itemName:
+                        total += int(item['quantity'])
+                        print(f"{item['quantity']} {itemName} in shipment with ID {doc['_id']}")
+            print(f"A total of {total} {itemName} are in storage right now.")
+        else:
+            print(f"No shipments found with '{itemName}' in the 'Items' array.")
+    except OperationFailure as ex:
+        raise ex
+
+def returnItemCount(collection, itemName) -> int :
+    try:
+        result = collection.find({"Items": {"$elemMatch": {"name": itemName}}})
+
+        result_list = list(result)
+        result_count = len(result_list)
+        total = 0
+        if result_count > 0:
+            for doc in result_list:
+                for item in doc['Items']:
+                    if item['name'] == itemName:
+                        total += int(item['quantity'])
+            return total
+        else:
+            return 0
+    except OperationFailure as ex:
+        raise ex
+    
+def updateSupplier(collection, supplier):
+        try:
+            foundIT = collection.find({"supplier": supplier})
+            result_list = list(foundIT)
+            result_count = len(result_list)
+            if result_count > 1:
+                print(f'{result_count} shipments were found with {supplier} as supplier.')
+                i = 1
+                for foundIT in result_list:
+                    print(f'{i}.-')
+                    print(foundIT)
+                    i += 1
+                option = int(input(f'Which shipment would you like to edit? 1 - {i-1} '))
+                for foundIT in result_list:
+                    if result_list == option - 1:
+                        stamp = foundIT['_id'] 
+                try:
+                    new_supplier = input("Enter the new supplier: ")
+                    updatedCollection = collection.find_one_and_update(
+                        {"_id": stamp},
+                        {"$set": {"supplier": new_supplier}},
+                        new = True
+                    )
+
+                    print("Shipment updated successfully.")
+                    print(updatedCollection)
+                except OperationFailure as ex:
+                    raise ex
+            elif result_count == 1:     
+                print(f'{result_count} shipment was found by {supplier}.')
+                try:
+                    new_supplier = input("Enter the new supplier: ")
+                
+                    updatedCollection = collection.find_one_and_update(
+                        {"supplier": supplier},
+                        {"$set": {"supplier": new_supplier}},
+                        new = True
+                    )
+
+                    print("Shipment updated successfully.")
+                    print(updatedCollection)
+                except OperationFailure as ex:
+                    raise ex
+            else:
+                print("No records found that have that supplier.")
+        except OperationFailure as ex:
+            raise ex
+
+def updateItemName(collection):
+    itemName = input("What's the item you want to update? ")
+    try:
+        result = collection.find({"Items": {"$elemMatch": {"name": itemName}}})
+        result_list = list(result)
+        result_count = len(result_list)
+        
+        if result_count > 0:
+            print(f'{result_count} shipments were found with {itemName}.')
+            
+            newItemName = input(f"What's the new name for {itemName}? ")
+            for doc in result_list:
+                for item in doc['Items']:
+                    if item['name'] == itemName:
+                        item['name'] = newItemName
+                        print(f"Updated item name in shipment with ID {doc['_id']}")
+            
+            for doc in result_list:
+                collection.update_one(
+                    {"_id": doc['_id']},
+                    {"$set": {"Items": doc['Items']}}
+                )
+            
+            print(f"Item name updated to {newItemName} in all matching shipments.")
+        else:
+            print(f"No shipments found with '{itemName}' in the 'Items' array.")
+    
+    except OperationFailure as ex:
+        raise ex
+
+def updateShipment(collection, storageLocation):
+    try:
         new_location = input("Enter the new warehouse location: ")
         new_supplier = input("Enter the new supplier: ")
-
+    
         collection.update_one(
-            {"arrivalDate": arrival_time},
+            {"storageLocation": storageLocation},
             {"$set": {"storageLocation": new_location, "supplier": new_supplier}}
         )
 
@@ -110,9 +284,10 @@ def updateShipment(collection, arrival_time):
     except OperationFailure as ex:
         raise ex
 
-def deleteShipment(collection, arrival_time):
+def deleteShipment(collection, supplier):
     try:
-        collection.delete_one({"arrivalDate": arrival_time})
+        collection.delete_one({"supplier": supplier})
         print("Shipment deleted successfully.")
     except OperationFailure as ex:
         raise ex
+

@@ -1,6 +1,7 @@
 from datetime import datetime
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
+from utility import utilityInventory
 
 def get_next_order_number(collection):
     """Checks the data base for the highest order number and adds 1 to it
@@ -20,7 +21,6 @@ def newSale(collection, collection2):
     try:
         current_datetime = datetime.now()
         order_time = current_datetime.strftime('%Y-%m-%dT%H:%M:%S.%f%z')
-        location = input("Where is this sale shipping to? ")
         how_many = int(input("How many items are being shipped in this shipment? "))
         items = []
         total_price = 0
@@ -29,8 +29,8 @@ def newSale(collection, collection2):
             price_paid = float(input("How much is the item: "))
             quantity = int(input("How many of these items were bought: "))
             
-            inventory_count = utilityInventory.return_item_count(collection2)
-            if inventory_count > quantity:
+            inventory_count = check_main_inv(collection2, name)
+            if inventory_count < quantity:
                 print(f"Sorry we only have {inventory_count}, of {name}")
                 return
             total_price += price_paid * quantity
@@ -40,7 +40,9 @@ def newSale(collection, collection2):
                 'quantity': quantity
             }
             items.append(item_temp)
+            update_main_inv(collection2, name, quantity)
         order_number = get_next_order_number(collection)
+        location = input("Where is this sale shipping to? ")
         document = {
             'dateOrderPlaced': order_time,
             'items': items,
@@ -51,6 +53,7 @@ def newSale(collection, collection2):
         collection.insert_one(document)
         print("Document created successfully.")
         print(f"Your Order Number is {order_number}")
+
     except ValueError as err:
         print(f"Error: {err}")
 
@@ -163,6 +166,27 @@ def delete_by_order_num(collection):
             print("No record found with given order number")
     except ValueError as err:
         print(f"Error: {err}")
+
+
+def update_main_inv(collection, item_name, count):
+    search = {"item": item_name}
+    in_stock = collection.find_one(search)
+    #get the amount linked with item name then add count and update db
+    if in_stock:
+        item_count = in_stock.get("quantity")
+        new_count = item_count + count
+
+        collection.update_one(search, {"$set": {"quantity": new_count}})
+        
+
+def check_main_inv(collection2, item_name) -> int:    
+    search = {"item": item_name}
+    in_stock = collection2.find_one(search)
+    if in_stock:
+        item_count = in_stock.get("quantity", 0)
+        return item_count
+    return 0
+
 
 
 
