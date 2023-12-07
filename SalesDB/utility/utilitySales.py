@@ -270,40 +270,18 @@ def take_inv(collection, item_name, count) -> None:
 
 
 def check_main_inv(collection2, item_name) -> int:
+    """Checks the main invetory
+
+    Args:
+        collection2: inventory db collection
+        item_name (_type_): name of item getting checked in inventory
+
+    Returns:
+        int: amount of given item
+    """
     search = {"item": item_name}
     in_stock = collection2.find_one(search)
     if in_stock:
         item_count = in_stock.get("quantity", 0)
         return item_count
     return 0
-
-
-def test_push(collection):
-    current_datetime = datetime.now()
-    order_time = current_datetime.strftime('%Y-%m-%dT%H:%M:%S.%f%z')
-    location = "Denver"
-    how_many = 1
-    items = []
-    for i in range(how_many):
-        name = "Pen"
-        price_paid = 2
-        quantity = 10
-        # item_temp = saleItem(name, price_paid, quantity)
-        item_temp = {
-            'name': name,
-            'pricePaid': price_paid,
-            'quantity': quantity
-        }
-        items.append(item_temp)
-    order_number = 1
-    total_price = 10000
-    document = {
-        'orderDate': order_time,
-        'items': items,
-        'shippingAddress': location,
-        'orderNumber': order_number,
-        'totalPrice': total_price
-    }
-    collection.insert_one(document)
-    print("Document created successfully.")
-    print(f"Your Order Number is {order_number}")
