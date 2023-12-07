@@ -2,7 +2,7 @@
 side of the database
 """
 from datetime import datetime
-#from rich.console import Console
+# from rich.console import Console
 
 
 def get_next_order_number(collection) -> None:
@@ -307,7 +307,7 @@ def check_main_inv(collection2, item_name) -> int:
 #             console.print(f"[bold]Order Number:[/bold] {order['orderNumber']}")
 #             console.print(f"[bold]Shipping Address:[/bold] {order['shippingAddress']}")
 #             console.print(f"[bold]Order Date:[/bold] {order['dateOrderPlaced']}")
-            
+
 #             console.print("[bold]Items: [/bold]")
 #             for item in order['items']:
 #                 console.print(f"[bold]Item Name:[/bold] {item['name']}")
@@ -320,4 +320,3 @@ def check_main_inv(collection2, item_name) -> int:
 #     except Exception as ex:
 #         console = Console()
 #         console.print(f"Error: {ex}")
-

@@ -23,21 +23,26 @@ def printShip(results) -> None:
 
             for shipment in result_list:
                 console.print("[bold]Order Details:[/bold]")
-                console.print(f"[bold]Shipment Arrival Date:[/bold] {shipment['arrivalDate']}")
+                console.print(
+                    f"[bold]Shipment Arrival Date:[/bold] {shipment['arrivalDate']}")
 
                 for item in shipment['Items']:
                     console.print(f"[bold]Item Name:[/bold] {item['name']}")
                     console.print("[bold]Tags:[/bold]")
-                    tags_str = ", ".join([f"[italic]{tag}[/italic]" for tag in item['tags']])
+                    tags_str = ", ".join(
+                        [f"[italic]{tag}[/italic]" for tag in item['tags']])
                     console.print(f"- {tags_str}")
-                    console.print(f"[bold]Price:[/bold] [green]{item['pricePaid']}[/green]")
-                    console.print(f"[bold]Quantity:[/bold] [blue]{item['quantity']}[/blue]\n")
+                    console.print(
+                        f"[bold]Price:[/bold] [green]{item['pricePaid']}[/green]")
+                    console.print(
+                        f"[bold]Quantity:[/bold] [blue]{item['quantity']}[/blue]\n")
         else:
             console = Console()
             console.print("[red]No shipments found.[/red]")
     except OperationFailure as ex:
         console = Console()
         console.print(f"Error: {ex}")
+
 
 def newShipment(collectionShip, collectionInv) -> None:
     console = Console()
@@ -105,7 +110,7 @@ def findShipmentDate(collection) -> None:
         date_to_search = f"{year_to_search}-{month_to_search}-{day_to_search}"
 
         query = {"arrivalDate": {"$regex": f"^{date_to_search}T"}}
-        
+
         try:
             query = {"arrivalDate": {"$regex": f"^{date_to_search}T"}}
             results = collection.find(query)
@@ -176,6 +181,7 @@ def findShipmentItem(collection):
     except OperationFailure as ex:
         console = Console()
         console.print(f"Error: {ex}")
+
 
 def returnItemCount(collection, itemName) -> int:
     try:
@@ -248,9 +254,11 @@ def updateSupplier(collection, supplier) -> None:
 
 def updateItemAmount(collectionShip, collectionInv) -> None:
     console = Console()
-    console.print("To change a specific item amount in a shipment provide the following info.")
+    console.print(
+        "To change a specific item amount in a shipment provide the following info.")
 
-    dates = input("Enter year, month, day and hour of when this shipment arrived: yyyy mm dd hh ").split()
+    dates = input(
+        "Enter year, month, day and hour of when this shipment arrived: yyyy mm dd hh ").split()
     date_to_search = f"{dates[0]}-{dates[1]}-{dates[2]}T{dates[3]}:"
     console.print(date_to_search)
 
@@ -278,19 +286,23 @@ def updateItemAmount(collectionShip, collectionInv) -> None:
             for item in doc['Items']:
                 if item['name'] == itemName:
                     old_quantity = item['quantity']
-                    new_quantity = int(input(f"Enter the new quantity for [bold]{itemName}[/bold]: "))
-                    currentInv = utilitySales.check_main_inv(collectionInv, itemName)
+                    new_quantity = int(
+                        input(f"Enter the new quantity for [bold]{itemName}[/bold]: "))
+                    currentInv = utilitySales.check_main_inv(
+                        collectionInv, itemName)
 
                     if new_quantity < old_quantity:
                         if (old_quantity - new_quantity) > currentInv:
-                            console.print('[red]Error setting new quantity to negatives[/red]')
+                            console.print(
+                                '[red]Error setting new quantity to negatives[/red]')
                             return
                         else:
                             collectionShip.update_one(
                                 {"_id": doc["_id"], "Items.name": itemName},
                                 {"$set": {"Items.$.quantity": new_quantity}}
                             )
-                            console.print(f"[green]Quantity of [bold]{itemName}[/bold] updated in Shipment successfully.[/green]")
+                            console.print(
+                                f"[green]Quantity of [bold]{itemName}[/bold] updated in Shipment successfully.[/green]")
                             collectionInv.update_one(
                                 {"item": itemName},
                                 {
@@ -301,13 +313,15 @@ def updateItemAmount(collectionShip, collectionInv) -> None:
                                 },
                                 upsert=False
                             )
-                            console.print(f"[green]Quantity of [bold]{itemName}[/bold] updated in Inventory successfully.[/green]")
+                            console.print(
+                                f"[green]Quantity of [bold]{itemName}[/bold] updated in Inventory successfully.[/green]")
                     else:
                         collectionShip.update_one(
                             {"_id": doc["_id"], "Items.name": itemName},
                             {"$set": {"Items.$.quantity": new_quantity}}
                         )
-                        console.print(f"[green]Quantity of [bold]{itemName}[/bold] updated in Shipment successfully.[/green]")
+                        console.print(
+                            f"[green]Quantity of [bold]{itemName}[/bold] updated in Shipment successfully.[/green]")
                         collectionInv.update_one(
                             {"item": itemName},
                             {
@@ -318,16 +332,19 @@ def updateItemAmount(collectionShip, collectionInv) -> None:
                             },
                             upsert=False
                         )
-                        console.print(f"[green]Quantity of [bold]{itemName}[/bold] updated in Inventory successfully.[/green]")
+                        console.print(
+                            f"[green]Quantity of [bold]{itemName}[/bold] updated in Inventory successfully.[/green]")
     except OperationFailure as ex:
         console.print(f"[red]Error: {ex}[/red]")
         raise ex
+
 
 def deleteShipment(collectionShip, collectionInv) -> None:
     console = Console()
     console.print("To delete a shipment, provide the following info.")
 
-    dates = input("Enter year, month, day and hour of when this shipment arrived: yyyy mm dd hh ").split()
+    dates = input(
+        "Enter year, month, day and hour of when this shipment arrived: yyyy mm dd hh ").split()
     date_to_search = f"{dates[0]}-{dates[1]}-{dates[2]}T{dates[3]}:"
     console.print(date_to_search)
 
@@ -347,19 +364,23 @@ def deleteShipment(collectionShip, collectionInv) -> None:
         console.print(f"[red]Error: {ex}[/red]")
         raise ex
 
-    item_name = input("Enter the name of the item to update in the inventory: ")
+    item_name = input(
+        "Enter the name of the item to update in the inventory: ")
 
     try:
         for shipment in result_list_shipments:
             for item in shipment['Items']:
                 if item['name'] == item_name:
-                    old_quantity = utilitySales.check_main_inv(collectionInv, item_name)
+                    old_quantity = utilitySales.check_main_inv(
+                        collectionInv, item_name)
                     updated_quantity = item['quantity']
                     if (old_quantity - updated_quantity) < 0:
-                        console.print("[red]Error.[/red]\n[red]Deleting would make inventory negative.[/red]")
+                        console.print(
+                            "[red]Error.[/red]\n[red]Deleting would make inventory negative.[/red]")
                     else:
                         collectionShip.delete_one(query_shipment)
-                        console.print("[green]Shipment deleted successfully.[/green]")
+                        console.print(
+                            "[green]Shipment deleted successfully.[/green]")
                         collectionInv.update_one(
                             {"item": item_name},
                             {"$set": {"quantity": (old_quantity - updated_quantity)}}
