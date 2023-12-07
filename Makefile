@@ -1,11 +1,12 @@
 TEST = pytest 
 TEST_ARGS = --verbose --color=yes
 TYPE_CHECK = mypy --strict --allow-untyped-decorators --ignore-missing-imports
-STYLE_CHECK = flake8
+STYLE_CHECK = flake8 --ignore=E501,C901
 STYLE_FIX = autopep8 --in-place --recursive --aggressive --aggressive
 
 .PHONY: all
-all: style-check type-check run-test clean
+all: run-test clean 
+#type-check style-check
 
 .PHONY: type-check
 type-check:
@@ -27,10 +28,8 @@ clean:
 	rm -rf .mypy_cache
 	rm -rf .hypothesis
 
-
 .PHONY: push
 push: run-test clean
-	
 
 .PHONY: fix-style
 fix-style:

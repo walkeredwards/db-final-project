@@ -1,7 +1,5 @@
-import os
-import time
-from typing import Tuple
 from utility import utilityInventory
+from utility import utilitySales
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 # from pymongo.errors import OperationFailure
@@ -45,18 +43,15 @@ def show_inventoryMenu() -> int:
 
 
 def show_tableMenu() -> int:
-    """Displays menu for working in wich table .
-        Must be changed later"""
+    """Displays menu for working in with diferent collections."""
     text = """
-    Welcome to Fencemart Database
+    Welcome to GJ-Market Database
     =============
 
     Are you working in Sales or Inventory?:
     1. Working in Sales
     2. Working in Inventory
     3. Exit
-
-    #Maybe add a both option or get rid of this after and make specific options to change tables
     """
     print(text)
     option = input('Enter an option: [1-3]: ')
@@ -76,21 +71,20 @@ def show_salesMenu() -> int:
     =============
 
     Select one of the following menu options:
-    1. Setup Database
-    2. Add a New Sale
-    3. Update Shipping Location
-    4. Update Item and Price
-    5. Update Date and Time
-    6. Look up Sale
-    7. Cancel Order
-    8. Exit the program
+    1. Add a New Sale
+    2. Update Shipping Location
+    3. Update Item and Price
+    4. Update Date and Time
+    5. Look up Sale
+    6. Cancel Order
+    7. Exit the program
     """
     print(text)
-    option = input('Enter an option: [1-8]: ')
+    option = input('Enter an option: [1-7]: ')
     while True:
         if option.isdecimal():
             opt = int(option)
-            if 1 <= opt <= 8:
+            if 1 <= opt <= 7:
                 return opt
         option = input("Enter a valid option: ")
 
@@ -106,24 +100,30 @@ def main() -> None:
             exit(0)
         elif option == 1:
             collection = db["sales"]
-            # option = show_salesMenu()
-            # while True:
-            #     if option == 8:
-            #         break
-            #     elif option == 1:
-            #         setup_database(collection)
-            #     elif option == 2:
-            #         utilitySales.newSale(collection)
-            #     elif option == 3:
-            #         utilitySales.update_shipping_location(collection)
-            #     elif option == 4:
-            #         update_name(collection)#item and price
-            #     elif option == 5:
-            #         update_time(collection)#date and time
-            #     elif option == 6:
-            #         utilitySales.look_up(collection)#look up
-            #     elif option == 7:
-            #         delete_sale(collection) #delete sal
+            collection2 = db["inventory"]
+            while True:
+                option = show_salesMenu()
+                if option == 7:
+                    break
+                elif option == 1:
+                    utilitySales.new_sale(collection, collection2)
+                    break
+                elif option == 2:
+                    utilitySales.update_shipping_location(collection)
+                    break
+                elif option == 3:
+                    utilitySales.update_item(
+                        collection, collection2)  # item and price
+                    break
+                elif option == 4:
+                    utilitySales.update_date_and_time(collection)
+                    break
+                elif option == 5:
+                    utilitySales.look_up(collection)
+                    break
+                elif option == 6:
+                    utilitySales.delete_by_order_num(collection, collection2)
+                    break
         elif option == 2:
             collectionShip = db["shipment"]
             collectionInv = db["inventory"]
@@ -150,7 +150,8 @@ def main() -> None:
                     utilityInventory.updateItemAmount(
                         collectionShip, collectionInv)
                 elif option == 7:
-                    utilityInventory.deleteShipment(collectionShip, collectionInv)
+                    utilityInventory.deleteShipment(
+                        collectionShip, collectionInv)
 
 
 if __name__ == "__main__":

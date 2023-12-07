@@ -1,5 +1,4 @@
 import pymongo
-from pymongo.server_api import ServerApi
 from pymongo.errors import OperationFailure
 from datetime import datetime
 from utility import utilitySales
@@ -13,11 +12,11 @@ class InventoryItem:
         self.quantity = quantity
 
 
-def newShipment(collectionShip, collectionInv):
+def newShipment(collectionShip, collectionInv) -> None:
     current_datetime = datetime.now()
     arrival_time = current_datetime.strftime('%Y-%m-%dT%H:%M:%S.%f%z')
-    location = input("What warehouse location this shipment arrived? ")
-    supplier = input("From wich suplier? ")
+    location = input("What warehouse location did this shipment arrive? ")
+    supplier = input("From which supplier? ")
     item_count = int(input("How many items arrived in this shipment? "))
 
     items = []
@@ -30,72 +29,44 @@ def newShipment(collectionShip, collectionInv):
         tags = []
         if add_tags:
             tag_count = int(input("How many tags would you like to add? "))
-            for i in range(tag_count):
-                tags.append(str(input(f"Enter tag #{i + 1}: ")))
-        if _ == 0:
-            items.append(InventoryItem(name, tags, price_paid, quantity))
-            print(items[_].tags)
-            shipment_document = {"arrivalDate": arrival_time,
-                                 "Items": [{"name": items[0].name,
-                                            "tags": items[0].tags,
-                                            "pricePaid": items[0].pricePaid,
-                                            "quantity": items[0].quantity}],
-                                 "storageLocation": location,
-                                 "supplier": supplier}
-            try:
-                collectionShip.insert_one(shipment_document)
-                collectionInv.update_one(
-                    {"item": items[0].name},
-                    {
-                        '$set': {
-                            "item": items[0].name,
-                            "quantity": items[0].quantity + utilitySales.check_main_inv(collectionInv, items[0].name)
-                        }
-                    },
-                    upsert=True
-                )
-                print("Document created successfully.")
-            except OperationFailure as ex:
-                raise ex
-        if _ > 0:
-            items.append(InventoryItem(name, tags, price_paid, quantity))
-            item_document = {"arrivalDate": arrival_time,
-                             "Items": [{"name": items[_].name,
-                                        "tags": items[_].tags,
-                                        "pricePaid": items[_].pricePaid,
-                                        "quantity": items[_].quantity}],
-                             "storageLocation": location,
-                             "supplier": supplier}
-            try:
-                collectionShip.update_one(
-                    {"arrivalDate": arrival_time},
-                    {"$push": {
-                        "Items": {
-                            "name": items[_].name,
-                            "tags": items[_].tags,
-                            "pricePaid": items[_].pricePaid,
-                            "quantity": items[_].quantity
-                        }
-                    }}
-                )
-                collectionInv.update_one(
-                    {"item": items[_].name},
-                    {
-                        '$set': {
-                            "item": items[_].name,
-                            "quantity": items[_].quantity + utilitySales.check_main_inv(collectionInv, items[_].name)
-                        }
-                    },
-                    upsert=True
-                )
-                print("Document appended successfully.")
-            except OperationFailure as ex:
-                raise ex
+            tags = [str(input(f"Enter tag #{i + 1}: "))
+                    for i in range(tag_count)]
+
+        item = InventoryItem(name, tags, price_paid, quantity)
+        items.append(item)
+
+        shipment_document = {
+            "arrivalDate": arrival_time,
+            "Items": [{
+                "name": item.name,
+                "tags": item.tags,
+                "pricePaid": item.pricePaid,
+                "quantity": item.quantity
+            }],
+            "storageLocation": location,
+            "supplier": supplier
+        }
+
+        try:
+            collectionShip.insert_one(shipment_document)
+            collectionInv.update_one(
+                {"item": item.name},
+                {
+                    '$set': {
+                        "item": item.name,
+                        "quantity": item.quantity + utilitySales.check_main_inv(collectionInv, item.name)
+                    }
+                },
+                upsert=True
+            )
+            print("Document created successfully.")
+        except pymongo.errors.OperationFailure as ex:
+            raise ex
 
 
-def findShipmentDate(collection):
-    print("Would you like to look for a Shipment made in a specific year, month or day? ")
-    option = int(input("1. Year\n2. Month\n3. Day :"))
+def findShipmentDate(collection) -> None:
+    print("Would you like to look for a shipment made in a specific year, month, or day?")
+    option = int(input("1. Year\n2. Month\n3. Day: "))
     if option == 3:
         year_to_search = input("Enter the year (e.g., 2018): ")
         month_to_search = input("Enter the month (e.g., 07): ")
@@ -162,7 +133,7 @@ def findShipmentDate(collection):
             raise ex
 
 
-def findShipmentSupplier(collection, supplier):
+def findShipmentSupplier(collection, supplier) -> None:
     try:
         result = collection.find({"supplier": supplier})
 
@@ -222,7 +193,7 @@ def returnItemCount(collection, itemName) -> int:
         raise ex
 
 
-def updateSupplier(collection, supplier):
+def updateSupplier(collection, supplier) -> None:
     try:
         foundIT = collection.find({"supplier": supplier})
         result_list = list(foundIT)
@@ -354,7 +325,7 @@ def updateItemAmount(collectionShip, collectionInv) -> None:
         raise ex
 
 
-def deleteShipment(collectionShip, collectionInv):
+def deleteShipment(collectionShip, collectionInv) -> None:
     print("To delete a shipment, provide the following info.")
     dates = input(
         "Enter year, month, day and hour of when this shipment arrived: yyyy mm dd hh ").split()
@@ -403,4 +374,3 @@ def deleteShipment(collectionShip, collectionInv):
                             f"Inventory updated for {item_name}. Quantity decreased by {updated_quantity}.")
     except OperationFailure as ex:
         raise ex
-#name
