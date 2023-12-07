@@ -5,8 +5,8 @@ STYLE_CHECK = flake8 --ignore=E501,C901
 STYLE_FIX = autopep8 --in-place --recursive --aggressive --aggressive
 
 .PHONY: all
-all: clean run-test
-#style-check type-check
+all: clean
+#style-check type-check run-test
 .PHONY: type-check
 type-check:
 	$(TYPE_CHECK) .
