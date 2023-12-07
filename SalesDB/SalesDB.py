@@ -2,7 +2,6 @@ import os
 import time
 from typing import Tuple
 from utility import utilityInventory
-from utility import utilitySales
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 # from pymongo.errors import OperationFailure
@@ -16,6 +15,7 @@ client = MongoClient(
     tls=True,
     tlsCertificateKeyFile=path_to_certificate,
     server_api=ServerApi("1"))
+
 
 def show_inventoryMenu() -> int:
     """Displays menu.
@@ -42,7 +42,8 @@ def show_inventoryMenu() -> int:
             if 1 <= opt <= 10:
                 return opt
         option = input("Enter a valid option: ")
-    
+
+
 def show_tableMenu() -> int:
     """Displays menu for working in wich table .
         Must be changed later"""
@@ -54,7 +55,7 @@ def show_tableMenu() -> int:
     1. Working in Sales
     2. Working in Inventory
     3. Exit
-    
+
     #Maybe add a both option or get rid of this after and make specific options to change tables
     """
     print(text)
@@ -65,7 +66,8 @@ def show_tableMenu() -> int:
             if 1 <= opt <= 3:
                 return opt
         option = input("Enter a valid option: ")
-        
+
+
 def show_salesMenu() -> int:
     """Displays menu.
         Must be changed later"""
@@ -121,7 +123,7 @@ def main() -> None:
             #     elif option == 6:
             #         utilitySales.look_up(collection)#look up
             #     elif option == 7:
-            #         delete_sale(collection) #delete sal 
+            #         delete_sale(collection) #delete sal
         elif option == 2:
             collectionShip = db["shipment"]
             collectionInv = db["inventory"]
@@ -136,15 +138,20 @@ def main() -> None:
                 elif option == 3:
                     utilityInventory.findShipmentItem(collectionShip)
                 elif option == 4:
-                    supplier = input("What supplier shipments would you like to look for? ")
-                    utilityInventory.findShipmentSupplier(collectionShip, supplier)
-                elif option == 5:   
-                    supplier = input("What is the supplier you would like to update? ")
+                    supplier = input(
+                        "What supplier shipments would you like to look for? ")
+                    utilityInventory.findShipmentSupplier(
+                        collectionShip, supplier)
+                elif option == 5:
+                    supplier = input(
+                        "What is the supplier you would like to update? ")
                     utilityInventory.updateSupplier(collectionShip, supplier)
                 elif option == 6:
-                    utilityInventory.updateItemAmout(collectionShip)
+                    utilityInventory.updateItemAmount(
+                        collectionShip, collectionInv)
                 elif option == 7:
-                    utilityInventory.deleteShipment(collectionShip)
+                    utilityInventory.deleteShipment(collectionShip, collectionInv)
+
 
 if __name__ == "__main__":
     main()
