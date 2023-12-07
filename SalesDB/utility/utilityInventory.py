@@ -11,7 +11,7 @@ class InventoryItem:
         self.quantity = quantity
 
 
-def newShipment(collection):
+def newShipment(collectionShip,collectionInv):
     current_datetime = datetime.now()
     arrival_time = current_datetime.strftime('%Y-%m-%dT%H:%M:%S.%f%z')
     location = input("What warehouse location this shipment arrived? ")
@@ -39,9 +39,13 @@ def newShipment(collection):
                 "storageLocation": location,
                 "supplier": supplier
             }
-
+            inv_document = {
+                "name" : items[0].name,
+                "quantity" : items[0].quantity
+            }
             try:
-                collection.insert_one(shipment_document)
+                collectionShip.insert_one(shipment_document)
+                collectionInv.insert_one(inv_document)
                 print("Document created successfully.")
             except OperationFailure as ex:
                 raise ex
@@ -54,7 +58,7 @@ def newShipment(collection):
                 "supplier": supplier
             }
             try:
-                collection.update_one(
+                collectionShip.update_one(
                     {"arrivalDate": arrival_time},
                     {"$push": {
                         "Items": {
@@ -64,6 +68,16 @@ def newShipment(collection):
                             "quantity": items[_].quantity
                         }
                     }}
+                )
+                collectionInv.update_one(
+                    {"name" : items[_].name},
+                    {
+                        '$set': {
+                            "name" : items[_].name,
+                            "quantity" : items[_].quantity
+                        }
+                    },
+                    upsert = True
                 )
                 print("Document appended successfully.")
             except OperationFailure as ex:
@@ -240,54 +254,4 @@ def updateSupplier(collection, supplier):
         except OperationFailure as ex:
             raise ex
 
-def updateItemName(collection):
-    itemName = input("What's the item you want to update? ")
-    try:
-        result = collection.find({"Items": {"$elemMatch": {"name": itemName}}})
-        result_list = list(result)
-        result_count = len(result_list)
-        
-        if result_count > 0:
-            print(f'{result_count} shipments were found with {itemName}.')
-            
-            newItemName = input(f"What's the new name for {itemName}? ")
-            for doc in result_list:
-                for item in doc['Items']:
-                    if item['name'] == itemName:
-                        item['name'] = newItemName
-                        print(f"Updated item name in shipment with ID {doc['_id']}")
-            
-            for doc in result_list:
-                collection.update_one(
-                    {"_id": doc['_id']},
-                    {"$set": {"Items": doc['Items']}}
-                )
-            
-            print(f"Item name updated to {newItemName} in all matching shipments.")
-        else:
-            print(f"No shipments found with '{itemName}' in the 'Items' array.")
-    
-    except OperationFailure as ex:
-        raise ex
-
-def updateShipment(collection, storageLocation):
-    try:
-        new_location = input("Enter the new warehouse location: ")
-        new_supplier = input("Enter the new supplier: ")
-    
-        collection.update_one(
-            {"storageLocation": storageLocation},
-            {"$set": {"storageLocation": new_location, "supplier": new_supplier}}
-        )
-
-        print("Shipment updated successfully.")
-    except OperationFailure as ex:
-        raise ex
-
-def deleteShipment(collection, supplier):
-    try:
-        collection.delete_one({"supplier": supplier})
-        print("Shipment deleted successfully.")
-    except OperationFailure as ex:
-        raise ex
 

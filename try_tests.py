@@ -23,7 +23,7 @@ db = client["sample_supplies"]
 collection = db["inventory"]
 doc_count = collection.count_documents({})
 print(doc_count)
-
+collection.find
 # Print the updated document
 updated_document = collection.find_one({})
 print(updated_document)

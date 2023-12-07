@@ -7,8 +7,7 @@ from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 # from pymongo.errors import OperationFailure
 
-path_to_certificate = './X509-\
-cert-1147331512641107939.pem'
+path_to_certificate = 'SalesDB/X509-cert-1147331512641107939.pem'
 uri = 'mongodb+srv://cluster0.j1hw0tj.mongodb.net/?authSource\
 =%24external&authMechanism=MONGODB-X509&retryWrites=true&w=\
 majority'
@@ -27,21 +26,21 @@ def show_inventoryMenu() -> int:
 
     Select one of the following menu options:
     1. Add a New Shipment
-    2. Update Suplier
-    3. Update Item Name
-    4. Update Item Amount
-    5. Update Date and Time
-    6. Delete Shipment
-    7. Exit the program
+    2. Look up Shipment by date
+    3. Look up Item
+    4. Look up Shipment by supplier
+    5. Update Supplier
+    6. Update Item Amount
+    7. Delete Shipment
+    8. Exit the program
     """
     print(text)
-    option = input('Enter an option: [1-7]: ')
+    option = input('Enter an option: [1-10]: ')
     while True:
         if option.isdecimal():
             opt = int(option)
-            if 1 <= opt <= 7:
+            if 1 <= opt <= 10:
                 return opt
-        os.system('clear')
         option = input("Enter a valid option: ")
     
 def show_tableMenu() -> int:
@@ -65,7 +64,6 @@ def show_tableMenu() -> int:
             opt = int(option)
             if 1 <= opt <= 3:
                 return opt
-        os.system('clear')
         option = input("Enter a valid option: ")
         
 def show_salesMenu() -> int:
@@ -92,7 +90,6 @@ def show_salesMenu() -> int:
             opt = int(option)
             if 1 <= opt <= 8:
                 return opt
-        os.system('clear')
         option = input("Enter a valid option: ")
 
 
@@ -105,53 +102,49 @@ def main() -> None:
         option = show_tableMenu()
         if option == 3:
             exit(0)
-        if option == 1:
+        elif option == 1:
             collection = db["sales"]
-            option = show_salesMenu()
+            # option = show_salesMenu()
+            # while True:
+            #     if option == 8:
+            #         break
+            #     elif option == 1:
+            #         setup_database(collection)
+            #     elif option == 2:
+            #         utilitySales.newSale(collection)
+            #     elif option == 3:
+            #         utilitySales.update_shipping_location(collection)
+            #     elif option == 4:
+            #         update_name(collection)#item and price
+            #     elif option == 5:
+            #         update_time(collection)#date and time
+            #     elif option == 6:
+            #         utilitySales.look_up(collection)#look up
+            #     elif option == 7:
+            #         delete_sale(collection) #delete sal 
+        elif option == 2:
+            collectionShip = db["shipment"]
+            collectionInv = db["inventory"]
             while True:
-                if option == 8:
+                option = show_inventoryMenu()
+                if option == 9:
                     break
                 elif option == 1:
-                    setup_database(collection)
+                    utilityInventory.newShipment(collectionShip, collectionInv)
                 elif option == 2:
-                    utilitySales.newSale(collection)
+                    utilityInventory.findShipmentDate(collectionShip)
                 elif option == 3:
-                    utilitySales.update_shipping_location(collection)
+                    utilityInventory.findShipmentItem(collectionShip)
                 elif option == 4:
-                    update_name(collection)#item and price
-                elif option == 5:
-                    update_time(collection)#date and time
+                    supplier = input("What supplier shipments would you like to look for? ")
+                    utilityInventory.findShipmentSupplier(collectionShip, supplier)
+                elif option == 5:   
+                    supplier = input("What is the supplier you would like to update? ")
+                    utilityInventory.updateSupplier(collectionShip, supplier)
                 elif option == 6:
-                    utilitySales.look_up(collection)#look up
+                    utilityInventory.updateItemAmout(collectionShip)
                 elif option == 7:
-                    delete_sale(collection) #delete sale
-            
-        if option == 2:
-            collection = db["inventory"]
-            option = show_inventoryMenu()
-            while True:
-                if option == 7:
-                    break
-                elif option == 1:
-                    utilityInventory.newShipment(collection)
-                elif option == 2:
-                    supplier = input("What is the supplier you would like to update")
-                    utilityInventory.updateSupplier(collection, supplier)
-                elif option == 3:
-                    utilityInventory.updateItemName(collection)
-                elif option == 4:
-                    utilityInventory.updateItemAmout(collection)
-                elif option == 5:
-                    utilityInventory.UpdateDateTime(collection)
-                elif option == 6:
-                    utilityInventory.deleteShipment(collection)
-
-                    
-            
-            
-            
-    
-
+                    utilityInventory.deleteShipment(collectionShip)
 
 if __name__ == "__main__":
     main()
