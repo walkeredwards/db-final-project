@@ -1,4 +1,8 @@
+"""All the functions for the sale/shipping
+side of the database
+"""
 from datetime import datetime
+#from rich.console import Console
 
 
 def get_next_order_number(collection) -> None:
@@ -30,7 +34,7 @@ def new_sale(collection, collection2) -> None:
             input("How many items are being shipped in this shipment? "))
         items = []
         total_price = 0
-        for i in range(how_many):
+        for _ in range(how_many):
             name = input("Whats the name of the item: ")
             price_paid = float(input("How much is the item: "))
             quantity = int(input("How many of these items were bought: "))
@@ -285,3 +289,35 @@ def check_main_inv(collection2, item_name) -> int:
         item_count = in_stock.get("quantity", 0)
         return item_count
     return 0
+
+
+# def print_order(collection) -> None:
+#     """Prints order details
+
+#     Args:
+#         collection: sales db collection
+#     """
+#     try:
+#         order_num = int(input("Please enter your order number: "))
+#         search = {"orderNumber": order_num}
+#         order = collection.find_one(search)
+#         if order:
+#             console = Console()
+#             console.print("[bold]Order Details:[/bold]")
+#             console.print(f"[bold]Order Number:[/bold] {order['orderNumber']}")
+#             console.print(f"[bold]Shipping Address:[/bold] {order['shippingAddress']}")
+#             console.print(f"[bold]Order Date:[/bold] {order['dateOrderPlaced']}")
+            
+#             console.print("[bold]Items: [/bold]")
+#             for item in order['items']:
+#                 console.print(f"[bold]Item Name:[/bold] {item['name']}")
+#                 console.print(f"[bold]Price:[/bold] [green]{item['pricePaid']}[/green]")
+#                 console.print(f"[bold]Quantity:[/bold] [blue]{item['quantity']}[/blue]")
+#                 console.print(f"[bold]Total Price:[/bold] [green]{item['totalPrice']}[/green]\n")
+#         else:
+#             console = Console()
+#             console.print("No shipments found.[/red]")
+#     except Exception as ex:
+#         console = Console()
+#         console.print(f"Error: {ex}")
+

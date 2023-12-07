@@ -33,11 +33,11 @@ def show_inventoryMenu() -> int:
     8. Exit the program
     """
     print(text)
-    option = input('Enter an option: [1-10]: ')
+    option = input('Enter an option: [1-8]: ')
     while True:
         if option.isdecimal():
             opt = int(option)
-            if 1 <= opt <= 10:
+            if 1 <= opt <= 8:
                 return opt
         option = input("Enter a valid option: ")
 
@@ -123,7 +123,7 @@ def main() -> None:
             collectionInv = db["inventory"]
             while True:
                 option = show_inventoryMenu()
-                if option == 9:
+                if option == 8:
                     break
                 elif option == 1:
                     utilityInventory.newShipment(collectionShip, collectionInv)
