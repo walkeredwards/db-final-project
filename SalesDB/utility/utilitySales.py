@@ -1,3 +1,6 @@
+"""All the functions for the sale/shipping
+side of the database
+"""
 from datetime import datetime
 
 
@@ -84,7 +87,7 @@ def update_shipping_location(collection) -> None:
             collection.update_one(search,
                                   {"$set": {"shippingAddress": new_address}})
             print(f"Shipping address for order "
-                 f"{order_num} updated successfully.")
+                  f"{order_num} updated successfully.")
         else:
             print("No Order found with order number.")
     except ValueError as err:
