@@ -18,6 +18,7 @@ client = MongoClient(
     tlsCertificateKeyFile=path_to_certificate,
     server_api=ServerApi("1"))
 
+
 def show_inventoryMenu() -> int:
     """Displays menu.
         Must be changed later"""
@@ -44,7 +45,8 @@ def show_inventoryMenu() -> int:
                 return opt
         os.system('clear')
         option = input("Enter a valid option: ")
-    
+
+
 def show_tableMenu() -> int:
     """Displays menu for working in wich table .
         Must be changed later"""
@@ -56,7 +58,7 @@ def show_tableMenu() -> int:
     1. Working in Sales
     2. Working in Inventory
     3. Exit
-    
+
     #Maybe add a both option or get rid of this after and make specific options to change tables
     """
     print(text)
@@ -68,7 +70,8 @@ def show_tableMenu() -> int:
                 return opt
         os.system('clear')
         option = input("Enter a valid option: ")
-        
+
+
 def show_salesMenu() -> int:
     """Displays menu.
         Must be changed later"""
@@ -119,7 +122,8 @@ def main() -> None:
                     utilitySales.update_shipping_location(collection)
                     break
                 elif option1 == 3:
-                    utilitySales.update_item(collection, collection2)#item and price
+                    utilitySales.update_item(
+                        collection, collection2)  # item and price
                     break
                 elif option1 == 4:
                     utilitySales.update_date_and_time(collection)
@@ -130,15 +134,14 @@ def main() -> None:
                 elif option1 == 6:
                     utilitySales.delete_by_order_num(collection, collection2)
                     break
-                
-            
+
         if option == 2:
             collection = db["inventory"]
             option = show_inventoryMenu()
             while True:
                 if option == 8:
                     exit(0)
-                
+
                 """
                 elif option == 1:
                     setup_database(collection)
@@ -155,10 +158,6 @@ def main() -> None:
                 elif option == 7:
                     delete_student(collection)
                 """
-            
-            
-            
-    
 
 
 if __name__ == "__main__":
