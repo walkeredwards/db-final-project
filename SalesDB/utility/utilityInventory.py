@@ -15,48 +15,40 @@ class InventoryItem:
 
 def printShip(results) -> None:
     try:
-        result_list = list(results)
-        result_count = len(result_list)
+        console = Console()
+        for shipment in results:
+            console.print("[bold]Order Details:[/bold]")
+            console.print(
+                f"[bold]Shipment Arrival Date:[/bold] {shipment['arrivalDate']}")
 
-        if result_count > 0:
-            console = Console()
-
-            for shipment in result_list:
-                console.print("[bold]Order Details:[/bold]")
+            for item in shipment['Items']:
+                console.print(f"[bold]Item Name:[/bold] {item['name']}")
+                console.print("[bold]Tags:[/bold]")
+                tags_str = ", ".join(
+                    [f"[italic]{tag}[/italic]" for tag in item['tags']])
+                console.print(f"- {tags_str}")
                 console.print(
-                    f"[bold]Shipment Arrival Date:[/bold] {shipment['arrivalDate']}")
+                    f"[bold]Price:[/bold] [green]{item['pricePaid']}[/green]")
+                console.print(
+                    f"[bold]Quantity:[/bold] [blue]{item['quantity']}[/blue]\n")
 
-                for item in shipment['Items']:
-                    console.print(f"[bold]Item Name:[/bold] {item['name']}")
-                    console.print("[bold]Tags:[/bold]")
-                    tags_str = ", ".join(
-                        [f"[italic]{tag}[/italic]" for tag in item['tags']])
-                    console.print(f"- {tags_str}")
-                    console.print(
-                        f"[bold]Price:[/bold] [green]{item['pricePaid']}[/green]")
-                    console.print(
-                        f"[bold]Quantity:[/bold] [blue]{item['quantity']}[/blue]\n")
-        else:
-            console = Console()
-            console.print("[red]No shipments found.[/red]")
     except OperationFailure as ex:
         console = Console()
         console.print(f"Error: {ex}")
 
 
-def printShipIndex(results) -> None:
+def printShipIndex(results) -> int:
     try:
         result_list = list(results)
         result_count = len(result_list)
-
+        i = 1
         if result_count > 0:
             console = Console()
-            i = 1
             for shipment in result_list:
-                console.print(f"[bold]Order {i}.- \nDetails:[/bold]")
+                console.print(f"[bold]Order {i}.-[/bold]")
                 console.print(
                     f"[bold]Shipment Arrival Date:[/bold] {shipment['arrivalDate']}")
-                i+1
+                i += 1
                 for item in shipment['Items']:
                     console.print(f"[bold]Item Name:[/bold] {item['name']}")
                     console.print("[bold]Tags:[/bold]")
@@ -67,6 +59,7 @@ def printShipIndex(results) -> None:
                         f"[bold]Price:[/bold] [green]{item['pricePaid']}[/green]")
                     console.print(
                         f"[bold]Quantity:[/bold] [blue]{item['quantity']}[/blue]\n")
+            return i
         else:
             console = Console()
             console.print("[red]No shipments found.[/red]")
@@ -236,44 +229,45 @@ def returnItemCount(collection, itemName) -> int:
 
 
 def updateSupplier(collection, supplier) -> None:
+    console = Console()
     try:
         foundIT = collection.find({"supplier": supplier})
         result_list = list(foundIT)
         result_count = len(result_list)
         if result_count > 1:
-            print(f'{result_count} shipments were found with {supplier} as supplier.')
-            printShipIndex(foundIT)
-            option = int(
-            input(f'Which shipment would you like to edit?'))
-            
-            for foundIT in result_list:
-                if result_list == option - 1:
-                    stamp = foundIT['arrivalDate']
+            console.print(f'[green]{result_count}[/green] shipments were found with [green]{supplier}[/green] as supplier.')
+            leng = printShipIndex(result_list)
+            option = int(input(f'Which shipment would you like to edit? 1 - {leng - 1}: '))
+            i = 1
+            for result in result_list:
+                if i == option:
+                    stamp = result['arrivalDate']
+                i += 1
             try:
                 new_supplier = input("Enter the new supplier: ")
                 updatedCollection = collection.find_one_and_update(
                     {"arrivalDate": stamp},
-                    {"$set": {"supplier": new_supplier}},
-                    new=True
+                    {"$set": {"supplier": new_supplier}}
                 )
 
                 print("Shipment updated successfully.")
-                printShip(updatedCollection)
+                list_found = list(foundIT)
+                printShip(list_found)
             except OperationFailure as ex:
                 raise ex
         elif result_count == 1:
-            print(f'{result_count} shipment was found by {supplier}.')
+            console.print(f'[green]1[/green] shipment was found with [green]{supplier}[/green] as supplier.')
+            printShip(result_list)
             try:
                 new_supplier = input("Enter the new supplier: ")
-
                 updatedCollection = collection.find_one_and_update(
                     {"supplier": supplier},
-                    {"$set": {"supplier": new_supplier}},
-                    new=True
+                    {"$set": {"supplier": new_supplier}}
                 )
 
                 print("Shipment updated successfully.")
-                printShip(updatedCollection)
+                list_found = list(foundIT)
+                printShip(list_found)
             except OperationFailure as ex:
                 raise ex
         else:
@@ -301,7 +295,7 @@ def updateItemAmount(collectionShip, collectionInv) -> None:
         result_count = len(result_list)
 
         if result_count > 0:
-            console.printShip(results)
+            printShip(results)
         else:
             console.print("[red]No shipments found for the given time.[/red]")
             return
