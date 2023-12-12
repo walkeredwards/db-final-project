@@ -289,8 +289,6 @@ def check_main_inv(collection2, item_name) -> int:
         item_count = in_stock.get("quantity", 0)
         return item_count
     return 0
-<<<<<<< HEAD
-=======
 
 
 # def print_order(collection) -> None:
@@ -322,4 +320,3 @@ def check_main_inv(collection2, item_name) -> int:
 #     except Exception as ex:
 #         console = Console()
 #         console.print(f"Error: {ex}")
->>>>>>> issue/1

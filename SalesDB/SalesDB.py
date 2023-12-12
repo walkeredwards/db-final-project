@@ -4,12 +4,9 @@ from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 # from pymongo.errors import OperationFailure
 
-<<<<<<< HEAD
 path_to_certificate = 'SalesDB/cert.pem'
 
-=======
-path_to_certificate = 'SalesDB/X509-cert-1147331512641107939.pem'
->>>>>>> issue/1
+#path_to_certificate = 'SalesDB/X509-cert-1147331512641107939.pem'
 uri = 'mongodb+srv://cluster0.j1hw0tj.mongodb.net/?authSource\
 =%24external&authMechanism=MONGODB-X509&retryWrites=true&w=\
 majority'
@@ -57,11 +54,6 @@ def show_tableMenu() -> int:
     1. Working in Sales
     2. Working in Inventory
     3. Exit
-<<<<<<< HEAD
-
-    #Maybe add a both option or get rid of this after and make specific options to change tables
-=======
->>>>>>> issue/1
     """
     print(text)
     option = input('Enter an option: [1-3]: ')
@@ -111,44 +103,6 @@ def main() -> None:
         elif option == 1:
             collection = db["sales"]
             collection2 = db["inventory"]
-<<<<<<< HEAD
-            option1 = show_salesMenu()
-            while True:
-                if option1 == 7:
-                    exit(0)
-                elif option1 == 1:
-                    utilitySales.new_sale(collection, collection2)
-                    break
-                elif option1 == 2:
-                    utilitySales.update_shipping_location(collection)
-                    break
-                elif option1 == 3:
-                    utilitySales.update_item(
-                        collection, collection2)  # item and price
-                    break
-                elif option1 == 4:
-                    utilitySales.update_date_and_time(collection)
-                    break
-                elif option1 == 5:
-                    utilitySales.look_up(collection)
-                    break
-                elif option1 == 6:
-                    utilitySales.delete_by_order_num(collection, collection2)
-                    break
-
-        if option == 2:
-            collection = db["inventory"]
-            option = show_inventoryMenu()
-            while True:
-                if option == 8:
-                    exit(0)
-
-                """
-                elif option == 1:
-                    setup_database(collection)
-                elif option == 2:
-                    add_student(collection)
-=======
             while True:
                 option = show_salesMenu()
                 if option == 7:
@@ -157,7 +111,6 @@ def main() -> None:
                     utilitySales.new_sale(collection, collection2)
                 elif option == 2:
                     utilitySales.update_shipping_location(collection)
->>>>>>> issue/1
                 elif option == 3:
                     utilitySales.update_item(
                         collection, collection2)  # item and price
@@ -193,13 +146,8 @@ def main() -> None:
                     utilityInventory.updateItemAmount(
                         collectionShip, collectionInv)
                 elif option == 7:
-<<<<<<< HEAD
-                    delete_student(collection)
-                """
-=======
                     utilityInventory.deleteShipment(
                         collectionShip, collectionInv)
->>>>>>> issue/1
 
 
 if __name__ == "__main__":

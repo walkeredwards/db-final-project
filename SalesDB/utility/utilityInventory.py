@@ -1,14 +1,8 @@
 import pymongo
-<<<<<<< HEAD
-from pymongo.server_api import ServerApi
-from pymongo.errors import OperationFailure
-from datetime import datetime
-=======
 from pymongo.errors import OperationFailure
 from datetime import datetime
 from utility import utilitySales
 from rich.console import Console
->>>>>>> issue/1
 
 
 class InventoryItem:
@@ -69,55 +63,6 @@ def newShipment(collectionShip, collectionInv) -> None:
         tags = []
         if add_tags:
             tag_count = int(input("How many tags would you like to add? "))
-<<<<<<< HEAD
-            for i in range(tag_count):
-                tags.append(str(input(f"Enter tag #{i + 1}: ")))
-        if _ == 0:
-            items.append(InventoryItem(name, tags, price_paid, quantity))
-            print(items[_].tags)
-            shipment_document = {"arrivalDate": arrival_time,
-                                 "Items": [{"name": items[0].name,
-                                            "tags": items[0].tags,
-                                            "pricePaid": items[0].pricePaid,
-                                            "quantity": items[0].quantity}],
-                                 "storageLocation": location,
-                                 "supplier": supplier}
-
-            try:
-                collection.insert_one(shipment_document)
-                print("Document created successfully.")
-            except OperationFailure as ex:
-                raise ex
-        if _ > 0:
-            items.append(InventoryItem(name, tags, price_paid, quantity))
-            item_document = {"arrivalDate": arrival_time,
-                             "Items": [{"name": items[_].name,
-                                        "tags": items[_].tags,
-                                        "pricePaid": items[_].pricePaid,
-                                        "quantity": items[_].quantity}],
-                             "storageLocation": location,
-                             "supplier": supplier}
-            try:
-                collection.update_one(
-                    {"arrivalDate": arrival_time},
-                    {"$push": {
-                        "Items": {
-                            "name": items[_].name,
-                            "tags": items[_].tags,
-                            "pricePaid": items[_].pricePaid,
-                            "quantity": items[_].quantity
-                        }
-                    }}
-                )
-                print("Document appended successfully.")
-            except OperationFailure as ex:
-                raise ex
-
-
-def findShipmentDate(collection):
-    print("Would you like to look for a Shipment made in a specific year, month or day? ")
-    option = int(input("1. Year\n2. Month\n3. Day :"))
-=======
             tags = [str(input(f"Enter tag #{i + 1}: "))
                     for i in range(tag_count)]
 
@@ -157,7 +102,6 @@ def findShipmentDate(collection):
 def findShipmentDate(collection) -> None:
     print("Would you like to look for a shipment made in a specific year, month, or day?")
     option = int(input("1. Year\n2. Month\n3. Day: "))
->>>>>>> issue/1
     if option == 3:
         year_to_search = input("Enter the year (e.g., 2018): ")
         month_to_search = input("Enter the month (e.g., 07): ")
@@ -166,22 +110,6 @@ def findShipmentDate(collection) -> None:
         date_to_search = f"{year_to_search}-{month_to_search}-{day_to_search}"
 
         query = {"arrivalDate": {"$regex": f"^{date_to_search}T"}}
-<<<<<<< HEAD
-        try:
-            results = collection.find(query)
-
-            result_list = list(results)
-            result_count = len(result_list)
-
-            if result_count > 0:
-                print("Shipments found:")
-                for shipment in result_list:
-                    print(shipment)
-            else:
-                print("No shipments found for the given supplier.")
-        except OperationFailure as ex:
-            raise ex
-=======
 
         try:
             query = {"arrivalDate": {"$regex": f"^{date_to_search}T"}}
@@ -190,7 +118,6 @@ def findShipmentDate(collection) -> None:
             printShip(results)
         except OperationFailure as ex:
             print(f"Error: {ex}")
->>>>>>> issue/1
 
     elif option == 2:
         year_to_search = input("Enter the year (e.g., 2018): ")
@@ -202,20 +129,7 @@ def findShipmentDate(collection) -> None:
 
         try:
             results = collection.find(query)
-<<<<<<< HEAD
-
-            result_list = list(results)
-            result_count = len(result_list)
-
-            if result_count > 0:
-                print("Shipments found:")
-                for shipment in result_list:
-                    print(shipment)
-            else:
-                print("No shipments found for the given supplier.")
-=======
             printShip(results)
->>>>>>> issue/1
         except OperationFailure as ex:
             raise ex
     elif option == 1:
@@ -226,38 +140,11 @@ def findShipmentDate(collection) -> None:
         try:
             results = collection.find(query)
 
-<<<<<<< HEAD
-            result_list = list(results)
-            result_count = len(result_list)
-
-            if result_count > 0:
-                print("Shipments found:")
-                for shipment in result_list:
-                    print(shipment)
-            else:
-                print("No shipments found for the given supplier.")
-=======
             printShip(results)
->>>>>>> issue/1
         except OperationFailure as ex:
             raise ex
 
 
-<<<<<<< HEAD
-def findShipmentSupplier(collection, supplier):
-    try:
-        result = collection.find({"supplier": supplier})
-
-        result_list = list(result)
-        result_count = len(result_list)
-
-        if result_count > 0:
-            print("Shipments found:")
-            for shipment in result_list:
-                print(shipment)
-        else:
-            print("No shipments found for the given supplier.")
-=======
 def findShipmentSupplier(collection, supplier) -> None:
     try:
         result = collection.find({"supplier": supplier})
@@ -291,37 +178,11 @@ def findShipmentItem(collection):
             console = Console()
             console.print(
                 f"No shipments found with '[bold]{itemName}[/bold]' in the 'Items' array.")
->>>>>>> issue/1
     except OperationFailure as ex:
         console = Console()
         console.print(f"Error: {ex}")
 
 
-<<<<<<< HEAD
-def findShipmentItem(collection):
-    itemName = input("What's the item you are looking for? ")
-    try:
-        result = collection.find({"Items": {"$elemMatch": {"name": itemName}}})
-
-        result_list = list(result)
-        result_count = len(result_list)
-        total = 0
-        if result_count > 0:
-            print(f'{result_count} shipments were found.')
-            for doc in result_list:
-                for item in doc['Items']:
-                    if item['name'] == itemName:
-                        total += int(item['quantity'])
-                        print(f"{item['quantity']} {
-                              itemName} in shipment with ID {doc['_id']}")
-            print(f"A total of {total} {itemName} are in storage right now.")
-        else:
-            print(f"No shipments found with '{
-                  itemName}' in the 'Items' array.")
-    except OperationFailure as ex:
-        raise ex
-
-
 def returnItemCount(collection, itemName) -> int:
     try:
         result = collection.find({"Items": {"$elemMatch": {"name": itemName}}})
@@ -341,130 +202,6 @@ def returnItemCount(collection, itemName) -> int:
         raise ex
 
 
-def updateSupplier(collection, supplier):
-    try:
-        foundIT = collection.find({"supplier": supplier})
-        result_list = list(foundIT)
-        result_count = len(result_list)
-        if result_count > 1:
-            print(f'{result_count} shipments were found with {
-                  supplier} as supplier.')
-            i = 1
-            for foundIT in result_list:
-                print(f'{i}.-')
-                print(foundIT)
-                i += 1
-            option = int(
-                input(f'Which shipment would you like to edit? 1 - {i - 1} '))
-            for foundIT in result_list:
-                if result_list == option - 1:
-                    stamp = foundIT['_id']
-            try:
-                new_supplier = input("Enter the new supplier: ")
-                updatedCollection = collection.find_one_and_update(
-                    {"_id": stamp},
-                    {"$set": {"supplier": new_supplier}},
-                    new=True
-                )
-
-                print("Shipment updated successfully.")
-                print(updatedCollection)
-            except OperationFailure as ex:
-                raise ex
-        elif result_count == 1:
-            print(f'{result_count} shipment was found by {supplier}.')
-            try:
-                new_supplier = input("Enter the new supplier: ")
-
-                updatedCollection = collection.find_one_and_update(
-                    {"supplier": supplier},
-                    {"$set": {"supplier": new_supplier}},
-                    new=True
-                )
-
-                print("Shipment updated successfully.")
-                print(updatedCollection)
-            except OperationFailure as ex:
-                raise ex
-        else:
-            print("No records found that have that supplier.")
-    except OperationFailure as ex:
-        raise ex
-
-
-def updateItemName(collection):
-    itemName = input("What's the item you want to update? ")
-    try:
-        result = collection.find({"Items": {"$elemMatch": {"name": itemName}}})
-        result_list = list(result)
-        result_count = len(result_list)
-
-        if result_count > 0:
-            print(f'{result_count} shipments were found with {itemName}.')
-
-            newItemName = input(f"What's the new name for {itemName}? ")
-            for doc in result_list:
-                for item in doc['Items']:
-                    if item['name'] == itemName:
-                        item['name'] = newItemName
-                        print(
-                            f"Updated item name in shipment with ID {
-                                doc['_id']}")
-
-            for doc in result_list:
-                collection.update_one(
-                    {"_id": doc['_id']},
-                    {"$set": {"Items": doc['Items']}}
-                )
-
-            print(f"Item name updated to {
-                  newItemName} in all matching shipments.")
-        else:
-            print(f"No shipments found with '{
-                  itemName}' in the 'Items' array.")
-
-    except OperationFailure as ex:
-        raise ex
-
-
-def updateShipment(collection, storageLocation):
-    try:
-        new_location = input("Enter the new warehouse location: ")
-        new_supplier = input("Enter the new supplier: ")
-
-        collection.update_one(
-            {"storageLocation": storageLocation},
-            {"$set": {"storageLocation": new_location, "supplier": new_supplier}}
-        )
-
-        print("Shipment updated successfully.")
-=======
-def returnItemCount(collection, itemName) -> int:
-    try:
-        result = collection.find({"Items": {"$elemMatch": {"name": itemName}}})
-
-        result_list = list(result)
-        result_count = len(result_list)
-        total = 0
-        if result_count > 0:
-            for doc in result_list:
-                for item in doc['Items']:
-                    if item['name'] == itemName:
-                        total += int(item['quantity'])
-            return total
-        else:
-            return 0
->>>>>>> issue/1
-    except OperationFailure as ex:
-        raise ex
-
-
-<<<<<<< HEAD
-def deleteShipment(collection, supplier):
-    try:
-        collection.delete_one({"supplier": supplier})
-        print("Shipment deleted successfully.")
-=======
 def updateSupplier(collection, supplier) -> None:
     try:
         foundIT = collection.find({"supplier": supplier})
@@ -511,7 +248,6 @@ def updateSupplier(collection, supplier) -> None:
                 raise ex
         else:
             print("No records found that have that supplier.")
->>>>>>> issue/1
     except OperationFailure as ex:
         raise ex
 
