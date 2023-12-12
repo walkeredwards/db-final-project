@@ -44,6 +44,37 @@ def printShip(results) -> None:
         console.print(f"Error: {ex}")
 
 
+def printShipIndex(results) -> None:
+    try:
+        result_list = list(results)
+        result_count = len(result_list)
+
+        if result_count > 0:
+            console = Console()
+            i = 1
+            for shipment in result_list:
+                console.print(f"[bold]Order {i}.- \nDetails:[/bold]")
+                console.print(
+                    f"[bold]Shipment Arrival Date:[/bold] {shipment['arrivalDate']}")
+                i+1
+                for item in shipment['Items']:
+                    console.print(f"[bold]Item Name:[/bold] {item['name']}")
+                    console.print("[bold]Tags:[/bold]")
+                    tags_str = ", ".join(
+                        [f"[italic]{tag}[/italic]" for tag in item['tags']])
+                    console.print(f"- {tags_str}")
+                    console.print(
+                        f"[bold]Price:[/bold] [green]{item['pricePaid']}[/green]")
+                    console.print(
+                        f"[bold]Quantity:[/bold] [blue]{item['quantity']}[/blue]\n")
+        else:
+            console = Console()
+            console.print("[red]No shipments found.[/red]")
+    except OperationFailure as ex:
+        console = Console()
+        console.print(f"Error: {ex}")
+        
+        
 def newShipment(collectionShip, collectionInv) -> None:
     console = Console()
 
@@ -100,8 +131,10 @@ def newShipment(collectionShip, collectionInv) -> None:
 
 
 def findShipmentDate(collection) -> None:
-    print("Would you like to look for a shipment made in a specific year, month, or day?")
-    option = int(input("1. Year\n2. Month\n3. Day: "))
+    console = Console()
+    console.print("Would you like to look for a shipment made in a specific year, month, or day?")
+    console.print("[red]1.[/red] Year\n[red]2.[/red] Month\n[red]3[/red]. Day: ", end=" ")
+    option = int(input(" "))
     if option == 3:
         year_to_search = input("Enter the year (e.g., 2018): ")
         month_to_search = input("Enter the month (e.g., 07): ")
@@ -177,7 +210,7 @@ def findShipmentItem(collection):
         else:
             console = Console()
             console.print(
-                f"No shipments found with '[bold]{itemName}[/bold]' in the 'Items' array.")
+                f"No shipments found with '[bold]{itemName}[/bold]' in the 'Items' section.")
     except OperationFailure as ex:
         console = Console()
         console.print(f"Error: {ex}")
@@ -209,20 +242,17 @@ def updateSupplier(collection, supplier) -> None:
         result_count = len(result_list)
         if result_count > 1:
             print(f'{result_count} shipments were found with {supplier} as supplier.')
-            i = 1
-            for foundIT in result_list:
-                print(f'{i}.-')
-                print(foundIT)
-                i += 1
+            printShipIndex(foundIT)
             option = int(
-                input(f'Which shipment would you like to edit? 1 - {i-1} '))
+            input(f'Which shipment would you like to edit?'))
+            
             for foundIT in result_list:
                 if result_list == option - 1:
-                    stamp = foundIT['_id']
+                    stamp = foundIT['arrivalDate']
             try:
                 new_supplier = input("Enter the new supplier: ")
                 updatedCollection = collection.find_one_and_update(
-                    {"_id": stamp},
+                    {"arrivalDate": stamp},
                     {"$set": {"supplier": new_supplier}},
                     new=True
                 )
@@ -262,7 +292,7 @@ def updateItemAmount(collectionShip, collectionInv) -> None:
     date_to_search = f"{dates[0]}-{dates[1]}-{dates[2]}T{dates[3]}:"
     console.print(date_to_search)
 
-    query = {"arrivalDate": {"$regex": f"^{date_to_search}"}}
+    query = {'arrivalDate': {'$regex': f'^{date_to_search}'}}
 
     try:
         results = collectionShip.find(query)

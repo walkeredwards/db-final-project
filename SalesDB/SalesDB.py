@@ -1,8 +1,10 @@
+from rich.console import Console
 from utility import utilityInventory
 from utility import utilitySales
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
-# from pymongo.errors import OperationFailure
+
+console = Console()
 
 path_to_certificate = 'SalesDB/X509-cert-1147331512641107939.pem'
 uri = 'mongodb+srv://cluster0.j1hw0tj.mongodb.net/?authSource\
@@ -14,85 +16,78 @@ client = MongoClient(
     tlsCertificateKeyFile=path_to_certificate,
     server_api=ServerApi("1"))
 
-
 def show_inventoryMenu() -> int:
-    """Displays menu.
-        Must be changed later"""
     text = """
-    Inventory Menu
-    =============
+[bold teal]Inventory Menu[/bold teal]
+=============
 
-    Select one of the following menu options:
-    1. Add a New Shipment
-    2. Look up Shipment by date
-    3. Look up Item
-    4. Look up Shipment by supplier
-    5. Update Supplier
-    6. Update Item Amount
-    7. Delete Shipment
-    8. Exit the program
-    """
-    print(text)
-    option = input('Enter an option: [1-8]: ')
-    while True:
-        if option.isdecimal():
-            opt = int(option)
-            if 1 <= opt <= 8:
-                return opt
-        option = input("Enter a valid option: ")
-
-
-def show_tableMenu() -> int:
-    """Displays menu for working in with diferent collections."""
-    text = """
-    Welcome to GJ-Market Database
-    =============
-
-    Are you working in Sales or Inventory?:
-    1. Working in Sales
-    2. Working in Inventory
-    3. Exit
-    """
-    print(text)
-    option = input('Enter an option: [1-3]: ')
-    while True:
-        if option.isdecimal():
-            opt = int(option)
-            if 1 <= opt <= 3:
-                return opt
-        option = input("Enter a valid option: ")
-
-
-def show_salesMenu() -> int:
-    """Displays menu.
-        Must be changed later"""
-    text = """
-    Sales Menu
-    =============
-
-    Select one of the following menu options:
-    1. Add a New Sale
-    2. Update Shipping Location
-    3. Update Item and Price
-    4. Update Date and Time
-    5. Look up Sale
-    6. Cancel Order
-    7. Exit the program
-    """
-    print(text)
-    option = input('Enter an option: [1-7]: ')
+Select one of the following menu options:
+1. [chartreuse1]Add a New Shipment[/chartreuse1]
+2. [chartreuse1]Look up Shipment by date[/chartreuse1]
+3. [chartreuse1]Look up Item[/chartreuse1]
+4. [chartreuse1]Look up Shipment by supplier[/chartreuse1]
+5. [chartreuse1]Update Supplier[/chartreuse1]
+6. [chartreuse1]Update Item Amount[/chartreuse1]
+7. [red]Exit the program[/red]
+"""
+    console.print(text)
+    console.print("[teal]Enter an option: [1-7]: [/teal]", end=" ")
+    option = input(' ')
     while True:
         if option.isdecimal():
             opt = int(option)
             if 1 <= opt <= 7:
                 return opt
-        option = input("Enter a valid option: ")
+        console.print("[teal]Enter a valid option.[/teal]", end=" ")
+        option = input(" ")
 
+def show_tableMenu() -> int:
+    text = """
+[bold teal]Welcome to GJ-Market Database[/bold teal]
+=============
+
+Are you working in [chartreuse1]Sales[/chartreuse1] or [chartreuse1]Inventory[/chartreuse1]?
+1. [chartreuse1]Working in Sales[/chartreuse1]
+2. [chartreuse1]Working in Inventory[/chartreuse1]
+3. [red]Exit[/red]
+"""
+    console.print(text)
+    console.print("[teal]Enter an option: [1-3]: [/teal]", end=" ")
+    option = input('')
+    while True:
+        if option.isdecimal():
+            opt = int(option)
+            if 1 <= opt <= 3:
+                return opt
+        console.print("[teal]Enter a valid option: [/teal]", end=" ")
+        option = input('')
+
+def show_salesMenu() -> int:
+    text = """
+[bold teal]Sales Menu[/bold teal]
+=============
+
+Select one of the following menu options:
+1. [chartreuse1]Add a New Sale[/chartreuse1]
+2. [chartreuse1]Update Shipping Location[/chartreuse1]
+3. [chartreuse1]Update Item and Price[/chartreuse1]
+4. [chartreuse1]Update Date and Time[/chartreuse1]
+5. [chartreuse1]Look up Sale[/chartreuse1]
+6. [chartreuse1]Cancel Order[/chartreuse1]
+7. [red]Exit the program[/red]
+"""
+    console.print(text)
+    console.print("[teal]Enter an option: [1-7]: [/teal]", end=" ")
+    option = input('')
+    while True:
+        if option.isdecimal():
+            opt = int(option)
+            if 1 <= opt <= 7:
+                return opt
+        console.print("[teal]Enter a valid option: [/teal]", end=" ")
+        option = input("")
 
 def main() -> None:
-    """Main function.
-    """
-    # Connect to database
     db = client["sample_supplies"]
     while True:
         option = show_tableMenu()
@@ -123,7 +118,7 @@ def main() -> None:
             collectionInv = db["inventory"]
             while True:
                 option = show_inventoryMenu()
-                if option == 8:
+                if option == 7:
                     break
                 elif option == 1:
                     utilityInventory.newShipment(collectionShip, collectionInv)
@@ -146,7 +141,6 @@ def main() -> None:
                 elif option == 7:
                     utilityInventory.deleteShipment(
                         collectionShip, collectionInv)
-
 
 if __name__ == "__main__":
     main()
