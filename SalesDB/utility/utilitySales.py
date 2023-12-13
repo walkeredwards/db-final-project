@@ -2,7 +2,9 @@
 side of the database
 """
 from datetime import datetime
-# from rich.console import Console
+from rich.console import Console
+
+console = Console()
 
 
 def get_next_order_number(collection) -> None:
@@ -30,18 +32,21 @@ def new_sale(collection, collection2) -> None:
         order_success = True
         current_datetime = datetime.now()
         order_time = current_datetime.strftime('%Y-%m-%dT%H:%M:%S.%f%z')
-        how_many = int(
-            input("How many items are being shipped in this shipment? "))
+        how_many = int(console.input(
+            "[bold]How many items are being shipped in this shipment?[/bold] "))
         items = []
         total_price = 0
         for _ in range(how_many):
-            name = input("Whats the name of the item: ")
-            price_paid = float(input("How much is the item: "))
-            quantity = int(input("How many of these items were bought: "))
+            name = console.input("[bold]Whats the name of the item:[/bold] ")
+            price_paid = float(
+                console.input("[bold]How much is the item:[/bold] "))
+            quantity = int(
+                console.input("[bold]How many of these items were bought:[/bold] "))
 
             inventory_count = check_main_inv(collection2, name)
             if inventory_count < quantity:
-                print(f"Sorry we only have {inventory_count}, of {name}")
+                console.print(
+                    f"[grey30]Sorry we only have {inventory_count}, of {name}[/grey30]")
                 order_success = False
                 return
             total_price += price_paid * quantity
@@ -56,7 +61,8 @@ def new_sale(collection, collection2) -> None:
             for item in items:
                 take_inv(collection2, item['name'], item['quantity'])
         order_number = get_next_order_number(collection)
-        location = input("Where is this sale shipping to? ")
+        location = console.input(
+            "[bold]Where is this sale shipping to?[/bold] ")
         document = {
             'dateOrderPlaced': order_time,
             'items': items,
@@ -65,11 +71,13 @@ def new_sale(collection, collection2) -> None:
             'totalPrice': total_price
         }
         collection.insert_one(document)
-        print("Document created successfully.")
-        print(f"Your Order Number is {order_number}")
+        console.print(
+            "[chartreuse1]Document created successfully.[/chartreuse1]")
+        console.print(
+            f"[bold]Your Order Number is [blue]{order_number}[/blue][/bold]")
 
     except ValueError as err:
-        print(f"Error: {err}")
+        console.print(f"Error: {err}")
 
 
 def update_shipping_location(collection) -> None:
@@ -79,20 +87,22 @@ def update_shipping_location(collection) -> None:
         collection: sales db collection
     """
     try:
-        order_num = int(input("Please enter your order number: "))
-        new_address = input("Please enter new shipping address: ")
+        order_num = int(
+            console.input("[bold]Please enter your order number:[/bold] "))
+        new_address = console.input(
+            "[bold]Please enter new shipping address:[/bold] ")
 
         search = {"orderNumber": order_num}
         order = collection.find_one(search)
         if order:
             collection.update_one(search,
                                   {"$set": {"shippingAddress": new_address}})
-            print(f"Shipping address for order "
-                  f"{order_num} updated successfully.")
+            console.print(f"Shipping address for order "
+                          f"{order_num} updated successfully.")
         else:
-            print("No Order found with order number.")
+            console.print("[red]No Order found with order number.[/red]")
     except ValueError as err:
-        print(f"Error: {err}")
+        console.print(f"[red]Error: {err}[/red]")
 
 
 def update_item(collection, collection2) -> None:
@@ -104,20 +114,25 @@ def update_item(collection, collection2) -> None:
         collection2: inventory db
     """
     try:
-        order_num = int(input("Please enter your order number: "))
+        order_num = int(
+            console.input("[bold]Please enter your order number:[/bold] "))
 
         search1 = {"orderNumber": order_num}
         check1 = collection.find_one(search1)
         if check1:
-            old_name = input("Please enter the name of the item to change: ")
+            old_name = console.input(
+                "[bold]Please enter the name of the item to change:[/bold] ")
 
             search = {"orderNumber": order_num, "items.name": old_name}
             order = collection.find_one(search)
 
             if order:
-                new_item = input("Please enter name of new item: ")
-                new_price = float(input("What is the price of the new item: "))
-                new_quantity = int(input("How many of the new items: "))
+                new_item = console.input(
+                    "[bold]Please enter name of new item:[/bold] ")
+                new_price = float(
+                    console.input("[bold]What is the price of the new item:[/bold] "))
+                new_quantity = int(
+                    console.input("[bold]How many of the new items:[/bold] "))
                 item_index = next(
                     (index for (
                         index,
@@ -134,7 +149,8 @@ def update_item(collection, collection2) -> None:
                             order['items'][item_index]['quantity'])
                         take_inv(collection2, new_item, new_quantity)
                     else:
-                        print("Out of stock of requested item")
+                        console.print(
+                            "[red]Out of stock of requested item[/red]")
                         return
                     update_document = {
                         "$set": {
@@ -153,13 +169,14 @@ def update_item(collection, collection2) -> None:
                         search1, {
                             "$set": {
                                 "totalPrice": new_total_price}})
-                    print("Item successfully updated")
+                    console.print(
+                        "[bold][chartreuse1]Item successfully updated[/chartreuse1][/bold]")
             else:
-                print("Item not found in order number")
+                console.print("[red]Item not found in order number[/red]")
         else:
-            print("No order found with given order number")
+            console.print("[red]No order found with given order number[/red]")
     except ValueError as err:
-        print(f"Error: {err}")
+        console.print(f"[red]Error: {err}[/red]")
 
 
 def update_date_and_time(collection) -> None:
@@ -168,7 +185,8 @@ def update_date_and_time(collection) -> None:
         collection: sales db collection
     """
     try:
-        order_num = int(input("Please enter your order number: "))
+        order_num = int(
+            console.input("[bold]Please enter your order number:[/bold] "))
 
         search = {"orderNumber": order_num}
         order = collection.find_one(search)
@@ -179,11 +197,13 @@ def update_date_and_time(collection) -> None:
 
             collection.update_one({"orderNumber": order_num}, {
                                   "$set": {"dateOrderPlaced": new_time}})
-            print("Date and Time updated to current date and time")
+            console.print(
+                "[bold]Date and Time updated to current date and time[/bold]")
         else:
-            print("No order found with given order number")
+            console.print(
+                "[bold][red]No order found with given order number[/red][/bold]")
     except ValueError as err:
-        print(f"Error: {err}")
+        console.print(f"[bold][red]Error: {err}[/red][/bold]")
 
 
 def look_up(collection) -> None:
@@ -192,22 +212,25 @@ def look_up(collection) -> None:
     Args:
         collection: sales db collection
     """
-    order_num = int(input("Please enter your order number: "))
+    order_num = int(console.input(
+        "[bold]Please enter your order number:[/bold] "))
     search = {"orderNumber": order_num}
     order = collection.find_one(search)
     if order:
-        print("Order Details:")
-        print(f"Order Number: {order['orderNumber']}")
-        print(f"Shipping Address: {order['shippingAddress']}")
-        print(f"Order Date: {order['dateOrderPlaced']}")
-        print("Items: ")
+        console.print("[bold]Order Details:[/bold]")
+        console.print(f"[bold]Order Number:[/bold] {order['orderNumber']}")
+        console.print(
+            f"[bold]Shipping Address:[/bold] {order['shippingAddress']}")
+        console.print(f"[bold]Order Date:[/bold] {order['dateOrderPlaced']}")
+        console.print("[bold]Items:[/bold] ")
         for item in order['items']:
-            print(f"Name: {item['name']}")
-            print(f"Price: {item['pricePaid']}")
-            print(f"Quantity: {item['quantity']}")
-        print(f"Total Price: {order['totalPrice']}")
+            console.print(
+                f"[bold]Name:[/bold] [chartreuse1]{item['name']}[/chartreuse1]")
+            console.print(f"[bold]Price:[/bold] {item['pricePaid']}")
+            console.print(f"[bold]Quantity:[/bold] {item['quantity']}")
+        console.print(f"[bold]Total Price:[/bold] {order['totalPrice']}")
     else:
-        print("No order found with given order number")
+        console.print("[red]No order found with given order number[/red]")
 
 
 def delete_by_order_num(collection, collection2) -> None:
@@ -218,23 +241,25 @@ def delete_by_order_num(collection, collection2) -> None:
         collection2: inventory db collection
     """
     try:
-        order_num = int(input("Please enter your order number: "))
+        order_num = int(
+            console.input("[bold]Please enter your order number:[/bold] "))
         search = {"orderNumber": order_num}
         order = collection.find_one(search)
         if order:
-            option = input("Are you sure you want to delete this order? y|n :")
+            option = console.input(
+                "[bold]Are you sure you want to [red]delete[/red] this order?[/bold] [chartreuse1]y[/chartreuse1]|[red]n[/red] :")
             if option.lower() == "y":
                 for item in order['items']:
                     update_main_inv(
                         collection2, item['name'], item['quantity'])
                 collection.delete_one(search)
-                print("Record Deleted")
+                console.print("Record [red]Deleted[/red]")
             else:
-                print("Record Not Deleted")
+                console.print("Record [red]Not Deleted[/red]")
         else:
-            print("No record found with given order number")
+            console.print("[red]No record found with given order number[/red]")
     except ValueError as err:
-        print(f"Error: {err}")
+        console.print(f"[red]Error: {err}[/red]")
 
 
 def update_main_inv(collection, item_name, count) -> None:
@@ -298,7 +323,7 @@ def check_main_inv(collection2, item_name) -> int:
 #         collection: sales db collection
 #     """
 #     try:
-#         order_num = int(input("Please enter your order number: "))
+#         order_num = int(console.input("Please enter your order number: "))
 #         search = {"orderNumber": order_num}
 #         order = collection.find_one(search)
 #         if order:

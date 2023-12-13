@@ -66,72 +66,79 @@ def printShipIndex(results) -> int:
     except OperationFailure as ex:
         console = Console()
         console.print(f"Error: {ex}")
-        
-        
+
+
 def newShipment(collectionShip, collectionInv) -> None:
     console = Console()
-
     current_datetime = datetime.now()
     arrival_time = current_datetime.strftime('%Y-%m-%dT%H:%M:%S.%f%z')
-    location = input("What warehouse location did this shipment arrive? ")
-    supplier = input("From which supplier? ")
-    item_count = int(input("How many items arrived in this shipment? "))
-
+    location = console.input("What warehouse location did this shipment arrive? ")
+    supplier = console.input("From which supplier? ")
+    item_count = int(console.input("How many items arrived in this shipment? "))
     items = []
     for _ in range(item_count):
-        name = input("What is the name of the item? ")
-        quantity = int(input("How many units arrived? "))
-        price_paid = float(input("What is the price paid for this item? "))
-        add_tags = input("Would you like to add tags? (Y/n) ").lower() == 'y'
-
+        name = console.input("What is the name of the item? ")
+        quantity = int(console.input("How many units arrived? "))
+        price_paid = float(console.input("What is the price paid for this item? "))
+        add_tags = console.input("Would you like to add tags? (Y/n) ").lower() == 'y'
         tags = []
         if add_tags:
-            tag_count = int(input("How many tags would you like to add? "))
-            tags = [str(input(f"Enter tag #{i + 1}: "))
-                    for i in range(tag_count)]
-
-        item = InventoryItem(name, tags, price_paid, quantity)
-        items.append(item)
-
-        shipment_document = {
-            "arrivalDate": arrival_time,
-            "Items": [{
-                "name": item.name,
-                "tags": item.tags,
-                "pricePaid": item.pricePaid,
-                "quantity": item.quantity
-            }],
-            "storageLocation": location,
-            "supplier": supplier
-        }
-
-        try:
-            collectionShip.insert_one(shipment_document)
-            collectionInv.update_one(
-                {"item": item.name},
-                {
-                    '$set': {
-                        "item": item.name,
-                        "quantity": item.quantity + utilitySales.check_main_inv(collectionInv, item.name)
-                    }
-                },
-                upsert=True
-            )
-            console.print("[green]Document created successfully.[/green]")
-        except pymongo.errors.OperationFailure as ex:
-            console.print(f"[red]Error: {ex}[/red]")
-            raise ex
+            tag_count = int(console.input("How many tags would you like to add? "))
+            for i in range(tag_count):
+                tags.append(str(console.input(f"Enter tag #{i + 1}: ")))
+        if _ == 0:
+            items.append(InventoryItem(name, tags, price_paid, quantity))
+            console.print(f"[italic]{items[_].tags}[/italic]")
+            shipment_document = {"arrivalDate": arrival_time,
+                                 "Items": [{"name": items[0].name,
+                                            "tags": items[0].tags,
+                                            "pricePaid": items[0].pricePaid,
+                                            "quantity": items[0].quantity}],
+                                 "storageLocation": location,
+                                 "supplier": supplier}
+            try:
+                collectionShip.insert_one(shipment_document)
+                print("Document created successfully.")
+            except OperationFailure as ex:
+                raise ex
+        if _ > 0:
+            items.append(InventoryItem(name, tags, price_paid, quantity))
+            item_document = {"arrivalDate": arrival_time,
+                             "Items": [{"name": items[_].name,
+                                        "tags": items[_].tags,
+                                        "pricePaid": items[_].pricePaid,
+                                        "quantity": items[_].quantity}],
+                             "storageLocation": location,
+                             "supplier": supplier}
+            try:
+                collectionShip.update_one(
+                    {"arrivalDate": arrival_time},
+                    {"$push": {
+                        "Items": {
+                            "name": items[_].name,
+                            "tags": items[_].tags,
+                            "pricePaid": items[_].pricePaid,
+                            "quantity": items[_].quantity
+                        }
+                    }}
+                )
+                print("Document appended successfully.")
+            except OperationFailure as ex:
+                raise ex
 
 
 def findShipmentDate(collection) -> None:
     console = Console()
-    console.print("Would you like to look for a shipment made in a specific year, month, or day?")
-    console.print("[red]1.[/red] Year\n[red]2.[/red] Month\n[red]3[/red]. Day: ", end=" ")
-    option = int(input(" "))
+    console.print(
+        "Would you like to look for a shipment made in a specific year, month, or day?")
+    console.print(
+        "[red]1.[/red] Year\n[red]2.[/red] Month\n[red]3[/red]. Day: ",
+        end=" ")
+    option = int(console.input(" "))
     if option == 3:
-        year_to_search = input("Enter the year (e.g., 2018): ")
-        month_to_search = input("Enter the month (e.g., 07): ")
-        day_to_search = input("Enter the day (e.g., 18): ")
+        year_to_search = console.input("Enter the year (e.g., 2018): ")
+        month_to_search = console.input("Enter the month (e.g., 07): ")
+        day_to_search = console.input("Enter the day (e.g., 18): ")
 
         date_to_search = f"{year_to_search}-{month_to_search}-{day_to_search}"
 
@@ -146,8 +153,8 @@ def findShipmentDate(collection) -> None:
             print(f"Error: {ex}")
 
     elif option == 2:
-        year_to_search = input("Enter the year (e.g., 2018): ")
-        month_to_search = input("Enter the month (e.g., 07): ")
+        year_to_search = console.input("Enter the year (e.g., 2018): ")
+        month_to_search = console.input("Enter the month (e.g., 07): ")
 
         date_to_search = f"{year_to_search}-{month_to_search}"
 
@@ -159,7 +166,7 @@ def findShipmentDate(collection) -> None:
         except OperationFailure as ex:
             raise ex
     elif option == 1:
-        year_to_search = input("Enter the year (e.g., 2018): ")
+        year_to_search = console.input("Enter the year (e.g., 2018): ")
 
         query = {"arrivalDate": {"$regex": f"^{year_to_search}-"}}
 
@@ -180,7 +187,7 @@ def findShipmentSupplier(collection, supplier) -> None:
 
 
 def findShipmentItem(collection):
-    itemName = input("What's the item you are looking for? ")
+    itemName = console.input("What's the item you are looking for? ")
     try:
         result = collection.find({"Items": {"$elemMatch": {"name": itemName}}})
 
@@ -235,16 +242,18 @@ def updateSupplier(collection, supplier) -> None:
         result_list = list(foundIT)
         result_count = len(result_list)
         if result_count > 1:
-            console.print(f'[green]{result_count}[/green] shipments were found with [green]{supplier}[/green] as supplier.')
+            console.print(
+                f'[green]{result_count}[/green] shipments were found with [green]{supplier}[/green] as supplier.')
             leng = printShipIndex(result_list)
-            option = int(input(f'Which shipment would you like to edit? 1 - {leng - 1}: '))
+            option = int(
+                console.input(f'Which shipment would you like to edit? 1 - {leng - 1}: '))
             i = 1
             for result in result_list:
                 if i == option:
                     stamp = result['arrivalDate']
                 i += 1
             try:
-                new_supplier = input("Enter the new supplier: ")
+                new_supplier = console.input("Enter the new supplier: ")
                 updatedCollection = collection.find_one_and_update(
                     {"arrivalDate": stamp},
                     {"$set": {"supplier": new_supplier}}
@@ -256,10 +265,11 @@ def updateSupplier(collection, supplier) -> None:
             except OperationFailure as ex:
                 raise ex
         elif result_count == 1:
-            console.print(f'[green]1[/green] shipment was found with [green]{supplier}[/green] as supplier.')
+            console.print(
+                f'[green]1[/green] shipment was found with [green]{supplier}[/green] as supplier.')
             printShip(result_list)
             try:
-                new_supplier = input("Enter the new supplier: ")
+                new_supplier = console.input("Enter the new supplier: ")
                 updatedCollection = collection.find_one_and_update(
                     {"supplier": supplier},
                     {"$set": {"supplier": new_supplier}}
@@ -281,7 +291,7 @@ def updateItemAmount(collectionShip, collectionInv) -> None:
     console.print(
         "To change a specific item amount in a shipment provide the following info.")
 
-    dates = input(
+    dates = console.input(
         "Enter year, month, day and hour of when this shipment arrived: yyyy mm dd hh ").split()
     date_to_search = f"{dates[0]}-{dates[1]}-{dates[2]}T{dates[3]}:"
     console.print(date_to_search)
@@ -303,7 +313,7 @@ def updateItemAmount(collectionShip, collectionInv) -> None:
         console.print(f"[red]Error: {ex}[/red]")
         raise ex
 
-    itemName = input("What's the item you are looking for? ")
+    itemName = console.input("What's the item you are looking for? ")
 
     try:
         for doc in result_list:
@@ -311,7 +321,7 @@ def updateItemAmount(collectionShip, collectionInv) -> None:
                 if item['name'] == itemName:
                     old_quantity = item['quantity']
                     new_quantity = int(
-                        input(f"Enter the new quantity for [bold]{itemName}[/bold]: "))
+                        console.input(f"Enter the new quantity for [bold]{itemName}[/bold]: "))
                     currentInv = utilitySales.check_main_inv(
                         collectionInv, itemName)
 
@@ -367,7 +377,7 @@ def deleteShipment(collectionShip, collectionInv) -> None:
     console = Console()
     console.print("To delete a shipment, provide the following info.")
 
-    dates = input(
+    dates = console.input(
         "Enter year, month, day and hour of when this shipment arrived: yyyy mm dd hh ").split()
     date_to_search = f"{dates[0]}-{dates[1]}-{dates[2]}T{dates[3]}:"
     console.print(date_to_search)
@@ -388,7 +398,7 @@ def deleteShipment(collectionShip, collectionInv) -> None:
         console.print(f"[red]Error: {ex}[/red]")
         raise ex
 
-    item_name = input(
+    item_name = console.input(
         "Enter the name of the item to update in the inventory: ")
 
     try:

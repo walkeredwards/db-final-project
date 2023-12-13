@@ -8,7 +8,7 @@ console = Console()
 
 path_to_certificate = 'SalesDB/cert.pem'
 
-#path_to_certificate = 'SalesDB/X509-cert-1147331512641107939.pem'
+# path_to_certificate = 'SalesDB/X509-cert-1147331512641107939.pem'
 uri = 'mongodb+srv://cluster0.j1hw0tj.mongodb.net/?authSource\
 =%24external&authMechanism=MONGODB-X509&retryWrites=true&w=\
 majority'
@@ -17,6 +17,7 @@ client = MongoClient(
     tls=True,
     tlsCertificateKeyFile=path_to_certificate,
     server_api=ServerApi("1"))
+
 
 def show_inventoryMenu() -> int:
     text = """
@@ -43,6 +44,7 @@ Select one of the following menu options:
         console.print("[teal]Enter a valid option.[/teal]", end=" ")
         option = input(" ")
 
+
 def show_tableMenu() -> int:
     text = """
 [bold teal]Welcome to GJ-Market Database[/bold teal]
@@ -63,6 +65,7 @@ Are you working in [chartreuse1]Sales[/chartreuse1] or [chartreuse1]Inventory[/c
                 return opt
         console.print("[teal]Enter a valid option: [/teal]", end=" ")
         option = input('')
+
 
 def show_salesMenu() -> int:
     text = """
@@ -88,6 +91,7 @@ Select one of the following menu options:
                 return opt
         console.print("[teal]Enter a valid option: [/teal]", end=" ")
         option = input("")
+
 
 def main() -> None:
     db = client["sample_supplies"]
@@ -143,6 +147,7 @@ def main() -> None:
                 elif option == 7:
                     utilityInventory.deleteShipment(
                         collectionShip, collectionInv)
+
 
 if __name__ == "__main__":
     main()
